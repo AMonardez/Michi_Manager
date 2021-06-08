@@ -180,7 +180,7 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
                                       firstDate: DateTime(2015),
                                       lastDate: DateTime(2100),
                                       dateLabelText: 'Fecha de Nacimiento',
-                                      onChanged: (val) => fechaNacimiento = DateTime.parse(val!),
+                                      onChanged: (val) => fechaNacimiento = DateTime.parse(val),
                                       validator: (val) {
                                         print(val);
                                         return null;

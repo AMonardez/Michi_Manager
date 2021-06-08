@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'animal.dart';
 
 class AddTratamiento extends StatefulWidget{
 
@@ -17,6 +18,8 @@ class _AddTratamientoState extends State<AddTratamiento>{
   var descripcion = TextEditingController();
   var tipos_eventos = ["Alimentación", "Medicamento"];
   var tipos_periodos = ["Horas", "Dias", "Semanas", "Meses"];
+  var animales_prueba = Animal.animales_de_prueba();
+  String? id_animal;
   String? tipo_evento;
   String? periodo;
   var fechaInicio= DateTime.now();
@@ -28,8 +31,8 @@ class _AddTratamientoState extends State<AddTratamiento>{
 
   @override
   Widget build(BuildContext context) {
-
-
+    for (Animal animal in animales_prueba)
+      print(animal.toString());
     return Scaffold(
       appBar: AppBar(title: Text("Agregar Evento")),
       body: ListView(
@@ -50,6 +53,25 @@ class _AddTratamientoState extends State<AddTratamiento>{
                           padding: const EdgeInsets.all(8.0),
                           child: Align(alignment: Alignment.centerLeft, child: Text("Tipo de Evento", textAlign: TextAlign.start, )),
                         ),*/
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: DropdownButtonFormField<String>(
+                            isExpanded: true,
+                            icon: Icon(Icons.pets),
+                            hint: id_animal == null ? Text("Seleccione Animal") : Text(id_animal!),
+                            value: id_animal,
+                            onChanged: (var value) {
+                              setState(() {
+                                id_animal = value!;
+                              });
+                            },
+                            items: animales_prueba.map((Animal an) {
+                              return DropdownMenuItem<String>(value: an.id.toString(), child: Text(an.nombre));
+                            }).toList(),
+                            validator: (value) => value == null
+                                ? 'Seleccione una mascota': null,
+                          ),
+                        ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: DropdownButtonFormField<String>(
@@ -83,7 +105,7 @@ class _AddTratamientoState extends State<AddTratamiento>{
                               ),
                               validator: (String? value){
                                 if (value == null || value.isEmpty) {
-                                  return 'El nombre de la mascota no puede estar vacío.';
+                                  return 'El nombre del evento no puede estar vacío.';
                                 }
                                 return null;
                               }
@@ -144,7 +166,7 @@ class _AddTratamientoState extends State<AddTratamiento>{
                             firstDate: DateTime(2015),
                             lastDate: DateTime(2100),
                             dateLabelText: 'Fecha de Inicio',
-                            onChanged: (val) => fechaInicio = DateTime.parse(val!),
+                            onChanged: (val) => fechaInicio = DateTime.parse(val),
                             validator: (val) {
                               print(val);
                               return null;
@@ -196,7 +218,7 @@ class _AddTratamientoState extends State<AddTratamiento>{
                                     ),
                                     validator: (String? value){
                                       if (value == null || value.isEmpty) {
-                                        return 'El nombre de la mascota no puede estar vacío.';
+                                        return 'El intervalo de tiempo no puede estar vacío.';
                                       }
                                       return null;
                                     }
@@ -275,12 +297,13 @@ class _AddTratamientoState extends State<AddTratamiento>{
                   child: ListBody(children: [
                     Text("Tipo de Evento:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(tipo_evento!),
+                    Text("ID animal:", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(id_animal!),
                     Text("Nombre:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(nombreController.text),
                     Text("Cantidad:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(cantidadController.text),
-                    Text("Fecha de Nacimiento:", style: TextStyle(fontWeight: FontWeight.bold)),
-
+                    Text("Fecha de Inicio:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(fechaInicio.toString()),
                     Text("Repeticiones:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(repeticiones.toString()),
@@ -296,12 +319,13 @@ class _AddTratamientoState extends State<AddTratamiento>{
                 }
                 ),
                 TextButton(child: Text("OK", style:TextStyle(color:Theme.of(context).accentColor)), onPressed:(){
-                  //TO-DO: Poner la llamada a la api aquí.
+
+                  //TODO: Poner la llamada a la api aquí.
 
                   final snackbar = SnackBar(
                       content: Text("Evento guardado exitosamente.") );
-                  //TO-DO: Cambiar por ruta nombrada en vez de pop().
 
+                  //TODO: Cambiar por ruta nombrada en vez de pop().
                   Navigator.pop(context);
                   Navigator.pop(context);
                   Navigator.pop(context);

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:michi_manager/add_tratamiento.dart';
+import 'package:michi_manager/pantalla_eventos.dart';
+import 'lista_eventos.dart';
 import 'test_screen.dart';
 import 'package:timelines/timelines.dart';
 //import 'package:flutter_icons/flutter_icons.dart';
@@ -33,6 +35,14 @@ class MenuAnvorgueso extends StatelessWidget{
                 title: Text("Agregar eventos"),
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => AddTratamiento()));
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.playlist_add_check),
+                title: Text("Ver eventos"),
+                //title: Row(children: <Widget>[Icon(Ionicons.ios_rocket), Text("Experimentos")],),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaEventos()));
                 },
               ),
               Divider(),
@@ -160,7 +170,8 @@ class MyHomePage extends StatelessWidget {
                       )
                     ]))
                 ])),
-              )
+              ),
+              //ListaEventos(),
             ])));
   }
 }
