@@ -1,5 +1,8 @@
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:michi_manager/animal.dart';
+
+import 'API.dart';
 //import 'package:numberpicker/numberpicker.dart';
 
 class AgregaPaciente extends StatefulWidget {
@@ -8,21 +11,18 @@ class AgregaPaciente extends StatefulWidget {
 }
 
 class _AgregaPacienteState extends State<AgregaPaciente> {
-  List<String> animalitos = ["Perro", "Gato", "Hamster", "Tortuga", "Iguana", "Otro"];
+  final _formKey = GlobalKey<FormState>();
+  List<String> lista_especies = ["Perro", "Gato", "Hamster", "Tortuga", "Iguana", "Otro"];
   List<String> sexos = ["Macho", "Hembra", "No lo sé"];
-  DateTime fechaNacimiento = DateTime.now();
-  int edad = 0;
-  int? sexo=0;
+
   var nombreController = TextEditingController();
+  var especie;
   var razaController = TextEditingController();
+  int? sexo=0;
+  bool castrado=false;
+  DateTime? fechaNacimiento;//= DateTime.now();
   var colorController = TextEditingController();
   var observacionesController = TextEditingController();
-  var tipo;
-  var color;
-  bool castrado=false;
-
-  final _formKey = GlobalKey<FormState>();
-
 
 
   @override
@@ -77,14 +77,14 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
                                 isExpanded: true,
 
                                 icon: Icon(Icons.workspaces_filled),
-                                hint: tipo == null ? Text("Seleccione tipo de animal") : Text(tipo),
-                                value: tipo,
+                                hint: especie == null ? Text("Seleccione tipo de animal") : Text(especie),
+                                value: especie,
                                 onChanged: (var value) {
                                   setState(() {
-                                    tipo = value;
+                                    especie = value;
                                   });
                                 },
-                                items: animalitos.map((String animal) {
+                                items: lista_especies.map((String animal) {
                                   return DropdownMenuItem<String>(value: animal, child: Text(animal));
                                 }).toList(),
                                 validator: (value) => value == null
@@ -102,12 +102,12 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
                                         border: OutlineInputBorder(),
                                         labelText: 'Raza',
                                       ),
-                                      validator: (String? value){
+                                      /*validator: (String? value){
                                         if (value == null || value.isEmpty) {
                                           return 'La raza de la mascota no puede estar vacío.';
                                         }
                                         return null;
-                                      }
+                                      }*/
                                   ),
                                 ),
 
@@ -303,7 +303,7 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
                   ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          _showMyDialog(nombreController.text, tipo, edad);
+                          _showMyDialog();
                         }
                         //print('Boton clickeado');
                       },
@@ -323,7 +323,7 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
   }
 
 
-  Future<void> _showMyDialog(String nombre, String tipo, int edad) async {
+  Future<void> _showMyDialog() async {
     return showDialog<void> (
         context: context,
         barrierDismissible: false,
@@ -332,22 +332,21 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
               content: SingleChildScrollView(
                   child: ListBody(children: [
                     Text("Nombre:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(nombre),
-                    Text("Tipo de animal:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(tipo),
-                    Text("Edad:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(edad.toString() ),
+                    Text(nombreController.text),
+                    Text("Especie:", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(especie),
+                    Text("Raza:", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(razaController.text.isEmpty?'No especificado':razaController.text),
                     Text("Sexo:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(sexo==0?'Macho':'Hembra'),
                     Text("Esterilizado:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(castrado?'Si':'No'),
                     Text("Fecha de Nacimiento:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    //Text(fechaNacimiento.toString()),
-                    Text(fechabonita(fechaNacimiento)),
+                    Text(fechaNacimiento==null?'No especificado':fechabonita(fechaNacimiento!)),
                     Text("Color:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(colorController.text),
+                    Text(colorController.text.isEmpty?'No especificado':colorController.text),
                     Text("Observaciones:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(observacionesController.text),
+                    Text(observacionesController.text.isEmpty?'No especificado':observacionesController.text),
 
                   ]
                   )
@@ -357,17 +356,34 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
                   Navigator.pop(context);
                 }
                 ),
-                TextButton(child: Text("OK", style:TextStyle(color:Theme.of(context).accentColor)), onPressed:(){
-                  //TO-DO: Poner la llamada a la api aquí.
+                TextButton(child: Text("OK", style:TextStyle(color:Theme.of(context).accentColor)), onPressed:() async {
+                  Animal an=Animal(nombre: nombreController.text,
+                                  especie: especie,
+                                  sexo: sexo==0?'Macho':'Hembra',
+                                  raza: razaController.text.isEmpty?'No especificado':razaController.text,
+                                  esterilizado: castrado,
+                                  color: colorController.text.isEmpty?'No especificado':colorController.text,
+                                  fecha_nacimiento: fechaNacimiento,
+                                  observaciones: observacionesController.text.isEmpty?'No especificado':observacionesController.text
+                  );
+                  bool resultado = await API.guardarAnimal(an);
+                  if(resultado){
+                    final snackbar = SnackBar(content: Text("Mascota registrada exitosamente."));
+                    //TO-DO: Cambiar por ruta nombrada en vez de pop().
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                  }
+                  else {
+                    final snackbar = SnackBar(content: Text("Falló al registrar la mascota."), backgroundColor: Colors.red);
+                    //TO-DO: Cambiar por ruta nombrada en vez de pop().
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(snackbar);
 
-                  final snackbar = SnackBar(
-                      content: Text("Animal guardado exitosamente.") );
-                  //TO-DO: Cambiar por ruta nombrada en vez de pop().
-
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                  }
 
                 }
                 )
@@ -384,7 +400,7 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
         /*confirmText: "OK",
         cancelText:"CANCELAR",*/
         context: context,
-        initialDate: fechaNacimiento,
+        initialDate: DateTime.now(),
         firstDate: DateTime(2000, 1),
         lastDate: DateTime(2100,12));
     if (picked != null && picked != fechaNacimiento)

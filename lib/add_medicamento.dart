@@ -5,36 +5,40 @@ import 'package:date_time_picker/date_time_picker.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'animal.dart';
 
-class AddTratamiento extends StatefulWidget{
+class AddMedicamento extends StatefulWidget{
 
   @override
-  _AddTratamientoState createState() => new _AddTratamientoState();
+  _AddMedicamentoState createState() => new _AddMedicamentoState();
 }
 
-class _AddTratamientoState extends State<AddTratamiento>{
+class _AddMedicamentoState extends State<AddMedicamento> {
   final _formKey = GlobalKey<FormState>();
   var nombreController = new TextEditingController();
   var cantidadController = new TextEditingController();
   var descripcion = TextEditingController();
-  var tipos_eventos = ["Alimentación", "Medicamento"];
   var tipos_periodos = ["Horas", "Dias", "Semanas", "Meses"];
-  var animales_prueba = Animal.animales_de_prueba();
+  late List<Animal> animales_prueba;
   String? id_animal;
-  String? tipo_evento;
+  String tipo_evento = 'Medicamento';
   String? periodo;
-  var fechaInicio= DateTime.now();
+  var fechaInicio = DateTime.now();
   var fechaInicio2 = DateTime.now().toString();
+  var repeticiones = 0;
+  TextEditingController intervaloController = new TextEditingController();
+  TextEditingController intervalo2Controller = new TextEditingController();
 
-  var repeticiones=0;
-
-  TextEditingController intervaloController= new TextEditingController();
+  @override
+  initState() {
+    animales_prueba = Animal.animales_de_prueba();
+    for (Animal animal in animales_prueba)
+      print(animal.toString());
+  }
 
   @override
   Widget build(BuildContext context) {
-    for (Animal animal in animales_prueba)
-      print(animal.toString());
+
     return Scaffold(
-      appBar: AppBar(title: Text("Agregar Evento")),
+      appBar: AppBar(title: Text("Agregar Medicamento")),
       body: ListView(
         children:[Form(
           key: _formKey,
@@ -72,25 +76,7 @@ class _AddTratamientoState extends State<AddTratamiento>{
                                 ? 'Seleccione una mascota': null,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: DropdownButtonFormField<String>(
-                            isExpanded: true,
-                            icon: Icon(Icons.apps),
-                            hint: tipo_evento == null ? Text("Seleccione tipo de evento") : Text(tipo_evento!),
-                            value: tipo_evento,
-                            onChanged: (var value) {
-                              setState(() {
-                                tipo_evento = value!;
-                              });
-                            },
-                            items: tipos_eventos.map((String evnt) {
-                              return DropdownMenuItem<String>(value: evnt, child: Text(evnt));
-                            }).toList(),
-                            validator: (value) => value == null
-                                ? 'Seleccione tipo de evento': null,
-                          ),
-                        ),
+
 
                         Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -175,7 +161,7 @@ class _AddTratamientoState extends State<AddTratamiento>{
                           )
                         ),
 
-                        Padding(
+                        /*Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Align(alignment: Alignment.centerLeft,child: Text("Seleccione veces de repeticiones:")),
                         ),
@@ -193,7 +179,7 @@ class _AddTratamientoState extends State<AddTratamiento>{
                                   border: Border.all(color: Theme.of(context).primaryColor),
                                   borderRadius: BorderRadius.circular(16)),
                               onChanged: (value) => setState(() => repeticiones = value)),
-                        ),
+                        ),*/
 
 
                         Padding(
@@ -201,6 +187,7 @@ class _AddTratamientoState extends State<AddTratamiento>{
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children:[
+                              Text("Cada "),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Container(
@@ -246,6 +233,60 @@ class _AddTratamientoState extends State<AddTratamiento>{
                               )
 
                             ]
+                          ),
+                        ),
+
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children:[
+                                Text("Durante"),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    width: 200,
+                                    child: TextFormField(
+                                        controller: intervaloController,
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                        scrollPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
+                                        obscureText: false,
+                                        decoration: InputDecoration(
+                                          prefixIcon: Icon(Icons.timer),
+                                          border: OutlineInputBorder(),
+                                          labelText: 'Intervalo',
+                                        ),
+                                        validator: (String? value){
+                                          if (value == null || value.isEmpty) {
+                                            return 'El intervalo de tiempo no puede estar vacío.';
+                                          }
+                                          return null;
+                                        }
+                                    ),
+                                  ),
+                                ),
+
+                                Container(
+                                  width: 100,
+                                  child: DropdownButtonFormField<String>(
+                                    isExpanded: true,
+                                    hint: periodo == null ? Text("Periodo") : Text(periodo!),
+                                    value: periodo,
+                                    onChanged: (var value) {
+                                      setState(() {
+                                        periodo = value;
+                                      });
+                                    },
+                                    items: tipos_periodos.map((String evnt) {
+                                      return DropdownMenuItem<String>(value: evnt, child: Text(evnt));
+                                    }).toList(),
+                                    validator: (value) => value == null
+                                        ? 'Seleccione tipo de periodo': null,
+                                  ),
+                                )
+
+                              ]
                           ),
                         )
 
@@ -296,7 +337,7 @@ class _AddTratamientoState extends State<AddTratamiento>{
               content: SingleChildScrollView(
                   child: ListBody(children: [
                     Text("Tipo de Evento:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(tipo_evento!),
+                    Text(tipo_evento),
                     Text("ID animal:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(id_animal!),
                     Text("Nombre:", style: TextStyle(fontWeight: FontWeight.bold)),

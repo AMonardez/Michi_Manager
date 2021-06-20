@@ -1,80 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:michi_manager/add_tratamiento.dart';
-import 'package:michi_manager/pantalla_eventos.dart';
-import 'lista_eventos.dart';
-import 'test_screen.dart';
 import 'package:timelines/timelines.dart';
-//import 'package:flutter_icons/flutter_icons.dart';
-import 'add_mascota.dart';
+import 'package:michi_manager/menu_anvorgueso.dart';
 
 void main() => runApp(MyApp());
-
-class MenuAnvorgueso extends StatelessWidget{
-  @override
-  Widget build(BuildContext context){
-    return
-        Drawer(
-            child: ListView(children: <Widget>[
-              DrawerHeader(
-                child: Text("Nombre usuario cuidador"),
-                decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-              ),
-              AbsorbPointer(child: ListTile(title: Text('Animales'))),
-              ListTile(
-                leading: Icon(Icons.add),
-                title: Text("Agregar mascota"),
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AgregaPaciente()));
-                },
-              ),
-              Divider(),
-              AbsorbPointer(child: ListTile(title: Text('Eventos'))),
-              ListTile(
-                leading: Icon(Icons.add),
-                title: Text("Agregar eventos"),
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddTratamiento()));
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.playlist_add_check),
-                title: Text("Ver eventos"),
-                //title: Row(children: <Widget>[Icon(Ionicons.ios_rocket), Text("Experimentos")],),
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaEventos()));
-                },
-              ),
-              Divider(),
-              AbsorbPointer(child: ListTile(title: Text('Extras'))),
-              ListTile(
-                leading: Icon(Icons.precision_manufacturing_rounded),
-                title: Text("Experimentos"),
-                //title: Row(children: <Widget>[Icon(Ionicons.ios_rocket), Text("Experimentos")],),
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => Testeos()));
-                },
-              ),
-              Divider(),
-              AbsorbPointer(child: ListTile(title: Text('Otros'))),
-              ListTile(
-                leading: Icon(Icons.info_rounded),
-                title: Text("Acerca de"),
-                //title: Row(children: <Widget>[Icon(Ionicons.ios_rocket), Text("Experimentos")],),
-                onTap: () {
-                  showAboutDialog(
-                      context: context,
-                      applicationName: "Maneja tus michitos",
-                      applicationVersion: "0.1-dev",
-                      applicationLegalese: "Blablabla");
-                },
-              )
-            ]))
-  ;
-  }
-
-}
-
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.

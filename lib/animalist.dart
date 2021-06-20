@@ -1,15 +1,15 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-class Animal {
-  int id;
-  String nombre;
-  String tipo;
-  String color;
-  int edad;
-  double peso;
+class Animalx {
+  late int id;
+  late String nombre;
+  late String tipo;
+  late String color;
+  late int edad;
+  late double peso;
 
-  Animal(this.id, this.nombre, this.tipo, this.color, this.edad, this.peso);
+  Animalx(this.id, this.nombre, this.tipo, this.color, this.edad, this.peso);
 
   Map<String, dynamic> toMap(){
     return {
