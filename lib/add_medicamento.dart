@@ -2,8 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:date_time_picker/date_time_picker.dart';
-import 'package:numberpicker/numberpicker.dart';
-import 'animal.dart';
+import 'models/Animal.dart';
 
 class AddMedicamento extends StatefulWidget{
 
@@ -16,21 +15,22 @@ class _AddMedicamentoState extends State<AddMedicamento> {
   var nombreController = new TextEditingController();
   var cantidadController = new TextEditingController();
   var descripcion = TextEditingController();
-  var tipos_periodos = ["Horas", "Dias", "Semanas", "Meses"];
-  late List<Animal> animales_prueba;
-  String? id_animal;
-  String tipo_evento = 'Medicamento';
-  String? periodo;
+  var tiposPeriodosCada = ["Horas", "Dias", "Semanas", "Meses"];
+  String? periodoCada;
+  var tiposPeriodosDurante = ["Dias", "Semanas", "Meses"];
+  String? periodoDurante;
+  late List<Animal> animalesPrueba;
+  String? idAnimal;
+  String tipoEvento = 'Medicamento';
   var fechaInicio = DateTime.now();
-  var fechaInicio2 = DateTime.now().toString();
-  var repeticiones = 0;
-  TextEditingController intervaloController = new TextEditingController();
-  TextEditingController intervalo2Controller = new TextEditingController();
+  TextEditingController intervaloCadaController = new TextEditingController();
+  TextEditingController intervaloDuranteController = new TextEditingController();
 
   @override
   initState() {
-    animales_prueba = Animal.animales_de_prueba();
-    for (Animal animal in animales_prueba)
+    super.initState();
+    animalesPrueba = Animal.animalesDePrueba();
+    for (Animal animal in animalesPrueba)
       print(animal.toString());
   }
 
@@ -38,21 +38,35 @@ class _AddMedicamentoState extends State<AddMedicamento> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(title: Text("Agregar Medicamento")),
+        appBar: AppBar(title: Text("Agregar Medicación", style: TextStyle(color: Colors.white, fontFamily: 'Nunito') ),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: <Color>[Color(0xff48c6ef), Color(0xff6f86d6)
+                    ])
+            ),
+          ),
+        ),
       body: ListView(
         children:[Form(
           key: _formKey,
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(20.0),
                 child: Card(
-                  elevation: 3.0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                  elevation: 5.0,
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(15.0),
                     child: Column(
                       children: [
-                        Align(alignment: Alignment.centerLeft,child: Text("Datos básicos del Evento",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 20))),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Align(alignment: Alignment.centerLeft,child: Text("Datos básicos del Evento",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 20))),
+                        ),
                         /*Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Align(alignment: Alignment.centerLeft, child: Text("Tipo de Evento", textAlign: TextAlign.start, )),
@@ -60,68 +74,74 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: DropdownButtonFormField<String>(
-                            isExpanded: true,
-                            icon: Icon(Icons.pets),
-                            hint: id_animal == null ? Text("Seleccione Animal") : Text(id_animal!),
-                            value: id_animal,
-                            onChanged: (var value) {
-                              setState(() {
-                                id_animal = value!;
-                              });
-                            },
-                            items: animales_prueba.map((Animal an) {
-                              return DropdownMenuItem<String>(value: an.id.toString(), child: Text(an.nombre));
-                            }).toList(),
-                            validator: (value) => value == null
-                                ? 'Seleccione una mascota': null,
+                              isExpanded: true,
+                              //icon: Icon(Icons.pets),
+                              hint: idAnimal == null ? Text("") : Text(idAnimal!),
+                              value: idAnimal,
+                              onChanged: (var value) {
+                                setState(() {
+                                  idAnimal = value!;
+                                });
+                              },
+                              items: animalesPrueba.map((Animal an) {
+                                return DropdownMenuItem<String>(value: an.id.toString(), child: Text(an.nombre));
+                              }).toList(),
+                              validator: (value) => value == null
+                                  ? 'Seleccione una mascota': null,
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(Icons.pets),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                labelText: "Mascota",
+
+                              )
+
                           ),
                         ),
-
 
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextFormField(
-                              controller: nombreController,
-                              scrollPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.edit_rounded),
-                                border: OutlineInputBorder(),
-                                labelText: 'Nombre del evento',
-                              ),
-                              validator: (String? value){
-                                if (value == null || value.isEmpty) {
-                                  return 'El nombre del evento no puede estar vacío.';
-                                }
-                                return null;
+                            controller: nombreController,
+                            scrollPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
+                            obscureText: false,
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(Icons.edit_rounded),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                              errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                              disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                              labelText: 'Nombre del Medicamento',
+                            ),
+                            validator: (String? value){
+                              if (value == null || value.isEmpty) {
+                                return 'El nombre del evento no puede estar vacío.';
                               }
+                              return null;
+                            },
                           ),
                         ),
 
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextFormField(
-                              controller: cantidadController,
-                              /*keyboardType: TextInputType.number,
+                            controller: cantidadController,
+                            /*keyboardType: TextInputType.number,
                               inputFormatters: [FilteringTextInputFormatter.digitsOnly],*/
-                              scrollPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.fastfood),
-                                border: OutlineInputBorder(),
-                                labelText: 'Cantidad (ej. 200gr)',
-                              ),
-                              /*validator: (String? value){
-                                if (value == null || value.isEmpty) {
-                                  return 'El nombre de la mascota no puede estar vacío.';
-                                }
-                                return null;
-                              }*/
+                            scrollPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
+                            obscureText: false,
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(Icons.adjust),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                              errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                              disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                              labelText: 'Cantidad (ej. 1 tableta)',
+                            ),
                           ),
                         ),
-
-
-
 
                       ],
                     ),
@@ -129,14 +149,18 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left:20.0, right: 20, top:5, bottom:20),
                 child: Card(
-                  elevation: 3.0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                  elevation: 5.0,
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(15.0),
                     child: Column(
                       children: [
-                        Align(alignment: Alignment.centerLeft,child: Text("Temporización del Evento",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 20))),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Align(alignment: Alignment.centerLeft,child: Text("Temporización del Evento",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 20))),
+                        ),
                         /*Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Align(alignment: Alignment.centerLeft, child: Text("Tipo de Evento", textAlign: TextAlign.start, )),
@@ -144,96 +168,28 @@ class _AddMedicamentoState extends State<AddMedicamento> {
 
 
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: DateTimePicker(
-                            icon: Icon(Icons.calendar_today),
-                            type: DateTimePickerType.dateTime,
-                            initialValue: fechaInicio.toString(),
-                            firstDate: DateTime(2015),
-                            lastDate: DateTime(2100),
-                            dateLabelText: 'Fecha de Inicio',
-                            onChanged: (val) => fechaInicio = DateTime.parse(val),
-                            validator: (val) {
-                              print(val);
-                              return null;
-                            },
-                            //onSaved: (val) => {fechaInicio = DateTime.parse(val!)},
-                          )
-                        ),
-
-                        /*Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Align(alignment: Alignment.centerLeft,child: Text("Seleccione veces de repeticiones:")),
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: NumberPicker(
-                              axis: Axis.horizontal,
-                              value: repeticiones,
-                              minValue: 0,
-                              maxValue: 1000,
-                              step: 1,
-                              haptics: true,
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Theme.of(context).primaryColor),
-                                  borderRadius: BorderRadius.circular(16)),
-                              onChanged: (value) => setState(() => repeticiones = value)),
-                        ),*/
-
-
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children:[
-                              Text("Cada "),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  width: 200,
-                                  child: TextFormField(
-                                    controller: intervaloController,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                    scrollPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
-                                    obscureText: false,
-                                    decoration: InputDecoration(
-                                      prefixIcon: Icon(Icons.timer),
-                                      border: OutlineInputBorder(),
-                                      labelText: 'Intervalo',
-                                    ),
-                                    validator: (String? value){
-                                      if (value == null || value.isEmpty) {
-                                        return 'El intervalo de tiempo no puede estar vacío.';
-                                      }
-                                      return null;
-                                    }
-                                  ),
-                                ),
-                              ),
-
-                              Container(
-                                width: 100,
-                                child: DropdownButtonFormField<String>(
-                                  isExpanded: true,
-                                  hint: periodo == null ? Text("Periodo") : Text(periodo!),
-                                  value: periodo,
-                                  onChanged: (var value) {
-                                    setState(() {
-                                      periodo = value;
-                                    });
-                                  },
-                                  items: tipos_periodos.map((String evnt) {
-                                    return DropdownMenuItem<String>(value: evnt, child: Text(evnt));
-                                  }).toList(),
-                                  validator: (value) => value == null
-                                      ? 'Seleccione tipo de periodo': null,
-                                ),
-                              )
-
-                            ]
-                          ),
+                            padding: const EdgeInsets.all(8.0),
+                            child: DateTimePicker(
+                                type: DateTimePickerType.dateTime,
+                                initialValue: fechaInicio.toString(),
+                                firstDate: DateTime(2015),
+                                lastDate: DateTime(2100),
+                                dateLabelText: 'Fecha de Inicio',
+                                onChanged: (val) => fechaInicio = DateTime.parse(val),
+                                validator: (val) {
+                                  print(val);
+                                  return null;
+                                },
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(Icons.calendar_today),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                  disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                  labelText: 'Fecha de Inicio',
+                                )
+                              //onSaved: (val) => {fechaInicio = DateTime.parse(val!)},
+                            )
                         ),
 
                         Padding(
@@ -241,21 +197,22 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                           child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children:[
-                                Text("Durante"),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                Flexible(
+                                  flex : 2,
                                   child: Container(
-                                    width: 200,
                                     child: TextFormField(
-                                        controller: intervaloController,
+                                        controller: intervaloCadaController,
                                         keyboardType: TextInputType.number,
                                         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                         scrollPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
                                         obscureText: false,
                                         decoration: InputDecoration(
                                           prefixIcon: Icon(Icons.timer),
-                                          border: OutlineInputBorder(),
-                                          labelText: 'Intervalo',
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                          errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                          disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                          labelText: 'Cada'
                                         ),
                                         validator: (String? value){
                                           if (value == null || value.isEmpty) {
@@ -267,24 +224,113 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                                   ),
                                 ),
 
-                                Container(
-                                  width: 100,
-                                  child: DropdownButtonFormField<String>(
-                                    isExpanded: true,
-                                    hint: periodo == null ? Text("Periodo") : Text(periodo!),
-                                    value: periodo,
-                                    onChanged: (var value) {
-                                      setState(() {
-                                        periodo = value;
-                                      });
-                                    },
-                                    items: tipos_periodos.map((String evnt) {
-                                      return DropdownMenuItem<String>(value: evnt, child: Text(evnt));
-                                    }).toList(),
-                                    validator: (value) => value == null
-                                        ? 'Seleccione tipo de periodo': null,
+                                Flexible(
+                                  flex:2,
+                                  child: Container(
+                                    padding:EdgeInsets.only(left:8),
+
+                                    height: 65,
+
+                                    child: DropdownButtonFormField<String>(
+                                        isExpanded: true,
+                                        hint: periodoCada == null ? Text("Periodo") : Text(periodoCada!),
+                                        value: periodoCada,
+                                        onChanged: (var value) {
+                                          setState(() {
+                                            periodoCada = value;
+                                          });
+                                        },
+                                        items: tiposPeriodosCada.map((String evnt) {
+                                          return DropdownMenuItem<String>(value: evnt, child: Text(evnt));
+                                        }).toList(),
+                                        validator: (value) => value == null
+                                            ? 'Seleccione periodo': null,
+                                        //decoration: InputDecoration(enabledBorder: InputBorder.none,)
+                                        decoration: InputDecoration(
+                                          prefixIcon: Icon(Icons.timer_10_sharp),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                          errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                          disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+
+
+                                        )
+                                      //decoration: InputDecoration.collapsed(hintText:''),
+                                    ),
                                   ),
-                                )
+                                ),
+
+
+                              ]
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children:[
+                                Flexible(
+                                  flex : 2,
+                                  child: Container(
+                                    child: TextFormField(
+                                        controller: intervaloDuranteController,
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                        scrollPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
+                                        obscureText: false,
+                                        decoration: InputDecoration(
+                                            prefixIcon: Icon(Icons.timer),
+                                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                            errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                            disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                            labelText: 'Durante'
+                                        ),
+                                        validator: (String? value){
+                                          if (value == null || value.isEmpty) {
+                                            return 'El intervalo de tiempo no puede estar vacío.';
+                                          }
+                                          return null;
+                                        }
+                                    ),
+                                  ),
+                                ),
+
+                                Flexible(
+                                  flex:2,
+                                  child: Container(
+                                    padding:EdgeInsets.only(left:8),
+                                    height: 65,
+                                    child: DropdownButtonFormField<String>(
+                                        isExpanded: true,
+                                        hint: periodoDurante == null ? Text("Periodo") : Text(periodoCada!),
+                                        value: periodoDurante,
+                                        onChanged: (var value) {
+                                          setState(() {
+                                            periodoDurante = value;
+                                          });
+                                        },
+                                        items: tiposPeriodosDurante.map((String evnt) {
+                                          return DropdownMenuItem<String>(value: evnt, child: Text(evnt));
+                                        }).toList(),
+                                        validator: (value) => value == null
+                                            ? 'Seleccione periodo': null,
+                                        //decoration: InputDecoration(enabledBorder: InputBorder.none,)
+                                        decoration: InputDecoration(
+                                          prefixIcon: Icon(Icons.timer_10_sharp),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                          errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                          disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                          labelText:'asda',
+
+
+                                        )
+                                      //decoration: InputDecoration.collapsed(hintText:''),
+                                    ),
+                                  ),
+                                ),
+
 
                               ]
                           ),
@@ -307,16 +353,26 @@ class _AddMedicamentoState extends State<AddMedicamento> {
         ),
 
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _showMyDialog();
-                  }
-                  //print('Boton clickeado');
-                },
-                child: Text('Guardar Evento')),
-          )
+            padding: EdgeInsets.only(bottom:15, left:50, right: 50, top:10),
+            child: Container(
+              height: 60,
+              decoration: ShapeDecoration(
+                shape: StadiumBorder(),
+                gradient: LinearGradient(begin: Alignment.topLeft, end:Alignment.bottomRight,
+                    colors: [Color(0xff48c6ef), Color(0xff6f86d6)
+                    ]),
+              ),
+              child: MaterialButton(
+                  elevation: 10.0,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: StadiumBorder(),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate())_showMyDialog();},
+                  child: Text('Guardar Medicamento', style: TextStyle(fontSize: 25, color: Colors.white, fontFamily: 'Nunito'),)
+              ),
+            ),
+          ),
+          SizedBox(height:50),
 
         ]
       )
@@ -337,19 +393,19 @@ class _AddMedicamentoState extends State<AddMedicamento> {
               content: SingleChildScrollView(
                   child: ListBody(children: [
                     Text("Tipo de Evento:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(tipo_evento),
+                    Text(tipoEvento),
                     Text("ID animal:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(id_animal!),
+                    Text(idAnimal!),
                     Text("Nombre:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(nombreController.text),
                     Text("Cantidad:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(cantidadController.text),
                     Text("Fecha de Inicio:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(fechaInicio.toString()),
-                    Text("Repeticiones:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(repeticiones.toString()),
-                    Text("Intervalo:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(intervaloController.text + " " +periodo! ),
+                    Text("Cada cuanto:", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text("${intervaloCadaController.text} $periodoCada"),
+                    Text("Durante:", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text("${intervaloDuranteController.text} $periodoDurante"),
 
                   ]
                   )
@@ -380,8 +436,6 @@ class _AddMedicamentoState extends State<AddMedicamento> {
         }
     );
   }
-
-
 
   String fechabonita(DateTime dt){
     var stringList =  dt.toIso8601String().split(new RegExp(r"[T\.]"));

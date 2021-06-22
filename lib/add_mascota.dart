@@ -1,9 +1,12 @@
+import 'dart:ui';
+
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:michi_manager/animal.dart';
 
+import 'models/Animal.dart';
 import 'API.dart';
-//import 'package:numberpicker/numberpicker.dart';
+
+//TODO: Arreglar que no se inserta la fecha de nacimiento.
 
 class AgregaPaciente extends StatefulWidget {
   @override
@@ -12,7 +15,7 @@ class AgregaPaciente extends StatefulWidget {
 
 class _AgregaPacienteState extends State<AgregaPaciente> {
   final _formKey = GlobalKey<FormState>();
-  List<String> lista_especies = ["Perro", "Gato", "Hamster", "Tortuga", "Iguana", "Otro"];
+  List<String> listaEspecies = ["Perro", "Gato", "Hamster", "Tortuga", "Iguana", "Otro"];
   List<String> sexos = ["Macho", "Hembra", "No lo sé"];
 
   var nombreController = TextEditingController();
@@ -28,27 +31,49 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Agregar Mascota"),
+        appBar: AppBar(title: Text("Registrar Mascota", style: TextStyle(color: Colors.white, fontFamily: 'Nunito') ),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: <Color>[Color(0xff48c6ef), Color(0xff6f86d6)
+                    ])
+            ),
+          ),
         ),
         body: ListView(
           children: [
               Form(
                 key: _formKey,
                 child: Column(children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          Card(
+                  Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: CircleAvatar(backgroundColor: Colors.cyan,
+                            child: Icon(Icons.camera_alt, color:Colors.white),
+                            backgroundImage: new AssetImage('fotos/logo.png'),
+                          radius: 80,
+                        ),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(top:5,left:25.0, right:25, bottom:20),
+                        child: Card(
+                          elevation: 8.0,
+
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                            //margin: EdgeInsets.all(25.0),
+
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
                               child: Column(children: [
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(15.0),
                                   child: Align(alignment: Alignment.centerLeft,child: Text("Datos básicos de la Mascota",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 20))),
                                 ),
-                            Padding(
+                          Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TextFormField(
                                   controller: nombreController,
@@ -56,7 +81,8 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
                                   obscureText: false,
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.edit_rounded),
-                                    border: OutlineInputBorder(),
+
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0)),
                                     labelText: 'Nombre',
                                   ),
                                 validator: (String? value){
@@ -66,57 +92,47 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
                                   return null;
                                 }
                               ),
-                            ),
-                            Padding(
+                          ),
+                          /*Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Align(alignment: Alignment.centerLeft, child: Text("Tipo de animal:", textAlign: TextAlign.start, )),
-                            ),
-                            Padding(
+                          ),*/
+                          Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: DropdownButtonFormField<String>(
                                 isExpanded: true,
-
-                                icon: Icon(Icons.workspaces_filled),
-                                hint: especie == null ? Text("Seleccione tipo de animal") : Text(especie),
+                                //icon: Icon(Icons.workspaces_filled),
+                                hint: especie == null ? Text("") : Text(especie),
                                 value: especie,
                                 onChanged: (var value) {
                                   setState(() {
                                     especie = value;
                                   });
                                 },
-                                items: lista_especies.map((String animal) {
+                                items: listaEspecies.map((String animal) {
                                   return DropdownMenuItem<String>(value: animal, child: Text(animal));
                                 }).toList(),
                                 validator: (value) => value == null
-                                ? 'Seleccione tipo de animal': null,
-                              ),
-                            ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: TextFormField(
-                                      controller: razaController,
-                                      scrollPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
-                                      obscureText: false,
-                                      decoration: InputDecoration(
-                                        prefixIcon: Icon(Icons.edit_rounded),
-                                        border: OutlineInputBorder(),
-                                        labelText: 'Raza',
-                                      ),
-                                      /*validator: (String? value){
-                                        if (value == null || value.isEmpty) {
-                                          return 'La raza de la mascota no puede estar vacío.';
-                                        }
-                                        return null;
-                                      }*/
-                                  ),
-                                ),
+                                ? 'Seleccione una especie de la lista.': null,
+                                  decoration: InputDecoration(
+                                    prefixIcon: Icon(Icons.pets),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                    errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                    disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                    labelText: 'Especie',
 
-                            Divider(),
-                            Padding(
+                                  )
+
+                              ),
+                          ),
+
+                          Divider(),
+                          Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Align(alignment: Alignment.centerLeft,child: Text("Seleccione el sexo de la mascota:")),
-                            ),
-                            Padding(
+                          ),
+                          Padding(
                               padding: const EdgeInsets.all(8.0),
                               child:
                                 Row(
@@ -153,173 +169,129 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
                                   ),),
                                 ],
                               ),
-                            ),
-                                Row(
-                                  children: [
-                                    SizedBox(width:10),
-                                    Text("¿Esterilizado?"),
-                                    Checkbox(
-                                      value: this.castrado,
-                                      onChanged: (bool? value) {
-                                        setState(() {
-                                          if(value==null || value==false) this.castrado=false;
-                                          else this.castrado=true;
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                Divider(),
-
-                                Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: DateTimePicker(
-                                      icon: Icon(Icons.calendar_today),
-                                      type: DateTimePickerType.date,
-                                      initialValue: fechaNacimiento.toString(),
-                                      firstDate: DateTime(2015),
-                                      lastDate: DateTime(2100),
-                                      dateLabelText: 'Fecha de Nacimiento',
-                                      onChanged: (val) => fechaNacimiento = DateTime.parse(val),
-                                      validator: (val) {
-                                        print(val);
-                                        return null;
-                                      },
-                                      //onSaved: (val) => {fechaInicio = DateTime.parse(val!)},
-                                    )
-                                ),
+                          ),
 
 
-                                /*Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: <Widget>[
-                                      Text("Seleccionar Fecha de Nacimiento: "),
-                                      SizedBox(height: 20.0,),
-                                      *//*RaisedButton(
-                                        onPressed: () => _selectDate(context),
-                                        child: Text('Select date'),
-                                      ),*//*
-                                      ElevatedButton(
-                                          onPressed: () => _selectDate(context),
-                                          child: Text(fechabonita(fechaNacimiento)))
-
-                                      ,
-                                    ],
-                                  ),
-                                ) ,*/
-
-
-
-
-
-
-
-
-
-
-                                /*Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Align(alignment: Alignment.centerLeft, child: Text("Edad en Años:", textAlign: TextAlign.start, )),
-                            ),
-                            NumberPicker(
-                                axis: Axis.horizontal,
-                                value: edad,
-                                minValue: 0,
-                                maxValue: 50,
-                                step: 1,
-                                haptics: true,
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: Theme.of(context).primaryColor),
-                                    borderRadius: BorderRadius.circular(16)),
-                                onChanged: (value) => setState(() => edad = value)),*/
-                            //Text("Valor actual: $edad"),
-
-
-                          ])),
-                          Card(
-                              child: Column(
-                                  children:[
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Align(alignment: Alignment.centerLeft,child: Text("Datos opcionales de la Mascota",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 20))),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: TextFormField(
-                                        controller: colorController,
-                                        scrollPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
-                                        obscureText: false,
-                                        decoration: InputDecoration(
-                                          prefixIcon: Icon(Icons.color_lens_outlined),
-                                          border: OutlineInputBorder(),
-                                          labelText: 'Color',
-                                        ),
-                                        /*validator: (String? value){
-                                    if (value == null || value.isEmpty) {
-                                      return 'El nombre de la mascota no puede estar vacío.';
-                                    }
-                                    return null;
-                                  }*/
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: TextFormField(
-                                        controller: observacionesController,
-                                        maxLines: 5,
-                                        scrollPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
-                                        obscureText: false,
-                                        decoration: InputDecoration(
-                                          prefixIcon: Icon(Icons.text_snippet_outlined),
-                                          border: OutlineInputBorder(),
-                                          labelText: 'Observaciones',
-                                        ),
-                                        /*validator: (String? value){
-                                    if (value == null || value.isEmpty) {
-                                      return 'El nombre de la mascota no puede estar vacío.';
-                                    }
-                                    return null;
-                                  }*/
-                                      ),
-                                    )
-                                  ]
-                              )
-                          )
-
-
-
-
-
-
-
-                        ],
+                        ]),
+                            )),
                       ),
+                      Card(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                          elevation:8,
+                          margin: EdgeInsets.only(left:30.0, right:30, top:8, bottom:20),
+                          child: ExpansionTile(
+                            title: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Align(alignment: Alignment.centerLeft,child: Text("Datos opcionales",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 20))),
+                      ),
+                            children: <Widget>[
+                              Column(
+                                children:[
+                                  Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: TextFormField(
+                                      controller: razaController,
+                                      scrollPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
+                                      obscureText: false,
+                                      decoration: InputDecoration(
+                                        prefixIcon: Icon(Icons.edit_rounded),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0)),
+                                        labelText: 'Raza',
+                                      ),),),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: TextFormField(
+                                      controller: colorController,
+                                      scrollPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
+                                      obscureText: false,
+                                      decoration: InputDecoration(
+                                        prefixIcon: Icon(Icons.color_lens_outlined),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0)),
+                                        labelText: 'Color',
+                                      ),),),
+                                  Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: DateTimePicker(
+                                        icon: Icon(Icons.calendar_today),
+                                        type: DateTimePickerType.date,
+                                        initialValue: fechaNacimiento.toString(),
+                                        firstDate: DateTime(2015),
+                                        lastDate: DateTime(2100),
+                                        dateLabelText: 'Fecha de Nacimiento',
+                                        onChanged: (val) => fechaNacimiento = DateTime.parse(val),
+                                        validator: (val) {
+                                          print(val);
+                                          return null;
+                                        },
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(Icons.calendar_today),
+                                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                            errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                            disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                            labelText: 'Fecha de Nacimiento',
+                                          )
+                                        //onSaved: (val) => {fechaInicio = DateTime.parse(val!)},
+                                      )),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: TextFormField(
+                                      controller: observacionesController,
+                                      maxLines: 5,
+                                      scrollPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 1.0),
+                                      obscureText: false,
+                                      decoration: InputDecoration(
+                                        prefixIcon: Icon(Icons.text_snippet_outlined),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0)),
+                                        labelText: 'Observaciones',
+                                      ),),),
 
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
 
-                    ),
+                                      Text("¿Esterilizado?"),
+                                      Checkbox(
+                                        value: this.castrado,
+
+                                        onChanged: (bool? value) {
+                                          setState(() {
+                                            if(value==null || value==false) this.castrado=false;
+                                            else this.castrado=true;
+                                          });
+                                        },
+                                      ),],),]
+
+                            ),]
+                          )
+                      ),
+                      Container(
+                        width: 250,
+                        height: 60,
+                        decoration: ShapeDecoration(
+                          shape: StadiumBorder(),
+                          gradient: LinearGradient(begin: Alignment.topLeft, end:Alignment.bottomRight,
+                              colors: [Color(0xff48c6ef), Color(0xff6f86d6)
+                              ]),
+                        ),
+                        child: MaterialButton(
+                            elevation: 10.0,
+                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            shape: StadiumBorder(),
+                            onPressed: () {
+                              if (_formKey.currentState!.validate())_showMyDialog();},
+                            child: Text('Guardar Mascota', style: TextStyle(fontSize: 25, color: Colors.white, fontFamily: 'Nunito'),)
+                        ),
+                      ),
+                      SizedBox(height:50),
+                    ],
                   ),
-                  ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _showMyDialog();
-                        }
-                        //print('Boton clickeado');
-                      },
-                      child: Text('Guardar Mascota'))
-                  /*ElevatedButton(
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(Colors.red), enableFeedback: true),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text('Volver'))*/
-                ]),
-              ),
+
+
+
             ],
 
-        ));
+        ))]));
   }
 
 
@@ -363,7 +335,7 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
                                   raza: razaController.text.isEmpty?'No especificado':razaController.text,
                                   esterilizado: castrado,
                                   color: colorController.text.isEmpty?'No especificado':colorController.text,
-                                  fecha_nacimiento: fechaNacimiento,
+                                  fechaNacimiento: fechaNacimiento,
                                   observaciones: observacionesController.text.isEmpty?'No especificado':observacionesController.text
                   );
                   bool resultado = await API.guardarAnimal(an);
@@ -392,21 +364,6 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
           );
         }
     );
-  }
-
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      helpText: "Seleccione Fecha de Nacimiento",
-        /*confirmText: "OK",
-        cancelText:"CANCELAR",*/
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(2000, 1),
-        lastDate: DateTime(2100,12));
-    if (picked != null && picked != fechaNacimiento)
-      setState(() {
-        fechaNacimiento = picked;
-      });
   }
 
   String fechabonita(DateTime dt){

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'evento.dart';
+import 'models/Evento.dart';
 
 class ListaEventos extends StatefulWidget{
   @override
@@ -9,44 +9,44 @@ class ListaEventos extends StatefulWidget{
 }
 
 class ListaEventosState extends State<ListaEventos>{
-  List<Evento> lista_eventos = Evento.lista_ejemplos();
+  List<Evento> listaEventos = Evento.listaEjemplos();
 
   @override
   Widget build(BuildContext context) {
-    //for(Evento e in lista_eventos) print(e.toString());
+    //for(Evento e in listaEventos) print(e.toString());
 
     /*return new ListView.builder(
-        itemCount: lista_eventos.length,
+        itemCount: listaEventos.length,
         itemBuilder: (BuildContext context, int index)
     {
-      return new ListTile(title: Text(lista_eventos[index].nombre),
-          subtitle: Text(lista_eventos[index].fecha.toString() + " (" + lista_eventos[index].cumplido.toString() + ")"),
+      return new ListTile(title: Text(listaEventos[index].nombre),
+          subtitle: Text(listaEventos[index].fecha.toString() + " (" + listaEventos[index].cumplido.toString() + ")"),
           trailing: Icon(Icons.check),
       );
     }
     );*/
 
     return new ListView.builder(
-        itemCount: lista_eventos.length,
+        itemCount: listaEventos.length,
         itemBuilder: (BuildContext context, int index)
         {
           return new CheckboxListTile(
-            title: Text(lista_eventos[index].nombre),
-            subtitle: Text(/*lista_eventos[index].fecha.toString() +*/
+            title: Text(listaEventos[index].nombre),
+            subtitle: Text(/*listaEventos[index].fecha.toString() +*/
 
-                lista_eventos[index].fecha.day.toString() + "/" + lista_eventos[index].fecha.month.toString()+
-                " " + lista_eventos[index].fecha.hour.toString() +":" +  lista_eventos[index].fecha.minute.toString()
+                listaEventos[index].fecha.day.toString() + "/" + listaEventos[index].fecha.month.toString()+
+                " " + listaEventos[index].fecha.hour.toString() +":" +  listaEventos[index].fecha.minute.toString()
                 +
                 " (" +
-                (lista_eventos[index].cumplido?"Cumplido":"Pendiente")
+                (listaEventos[index].cumplido?"Cumplido":"Pendiente")
                 + ")"),
-            value: lista_eventos[index].cumplido,
-            secondary: lista_eventos[index].tipo=='Alimentación'?Icon(Icons.fastfood):Icon(Icons.medical_services),
-            onChanged: (bool? value) { //if(value!=null) lista_eventos[index].cumplido=value;
+            value: listaEventos[index].cumplido,
+            secondary: listaEventos[index].tipo=='Alimentación'?Icon(Icons.fastfood):Icon(Icons.medical_services),
+            onChanged: (bool? value) { //if(value!=null) listaEventos[index].cumplido=value;
             setState(() {
-              List<Evento> aux= lista_eventos;
+              List<Evento> aux= listaEventos;
               aux[index].cumplido=value!;
-              lista_eventos=aux;
+              listaEventos=aux;
 
               //TODO: Llamar al endpoint de actualizar cumplido del evento.
 

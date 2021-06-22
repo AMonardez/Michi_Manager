@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:michi_manager/pantalla_eventos.dart';
 import 'package:michi_manager/test_screen.dart';
-import 'package:michi_manager/testapi.dart';
-
+import 'package:michi_manager/viewListadoMascotas.dart';
+import 'package:michi_manager/viewGraficos.dart';
 import 'add_alimentacion.dart';
-import 'add_foto.dart';
 import 'add_mascota.dart';
 import 'add_medicamento.dart';
 import 'add_peso.dart';
@@ -26,6 +26,14 @@ class MenuAnvorgueso extends StatelessWidget{
               title: Text("Agregar mascota"),
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => AgregaPaciente()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.format_list_bulleted),
+              title: Text("Listado de Animales"),
+              //title: Row(children: <Widget>[Icon(Ionicons.ios_rocket), Text("Experimentos")],),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ListaAnimales()));
               },
             ),
             Divider(),
@@ -61,6 +69,13 @@ class MenuAnvorgueso extends StatelessWidget{
                 Navigator.push(context, MaterialPageRoute(builder: (context) => AddPeso()));
               },
             ),
+            ListTile(
+              leading: Icon(Icons.show_chart),
+              title: Text("Gráficos de Peso"),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ViewGraficos()));
+              },
+            ),
             Divider(),
 
             AbsorbPointer(child: ListTile(title: Text('Extras'))),
@@ -86,14 +101,7 @@ class MenuAnvorgueso extends StatelessWidget{
                     applicationLegalese: "Blablabla");
               },
             ),
-            ListTile(
-              leading: Icon(Icons.camera_alt),
-              title: Text("Test api"),
-              //title: Row(children: <Widget>[Icon(Ionicons.ios_rocket), Text("Experimentos")],),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => TestApi()));
-              },
-            )
+
           ]))
     ;
   }

@@ -6,7 +6,7 @@ class Animal{
   String sexo; //0:macho, 1:hembra, 2:nobinario
   bool? esterilizado;
   String? color;
-  DateTime? fecha_nacimiento;
+  DateTime? fechaNacimiento;
   String? observaciones;
 
   Animal({this.id,
@@ -16,18 +16,18 @@ class Animal{
           this.raza,
           this.esterilizado,
           this.color,
-          this.fecha_nacimiento,
+          this.fechaNacimiento,
           this.observaciones});
 
   Animal.constructorMinimo({required this.nombre, required this.especie, required this.sexo});
 
-  static List<Animal> animales_de_prueba(){
+  static List<Animal> animalesDePrueba(){
     List<Animal> aux = [
     new Animal(id:1, nombre:"Tom", especie:"Gato", raza:"Romano", sexo:'Macho',
-        esterilizado:false, color:"Blanco", fecha_nacimiento:new DateTime.now(),
+        esterilizado:false, color:"Blanco", fechaNacimiento:new DateTime.now(),
         observaciones:"Comprado en el modulo 15"),
     new Animal(id:2, nombre:"Chocolo", especie:"Perro", raza:"Quiltro", sexo:'Macho',
-        esterilizado:true, color:"Café", fecha_nacimiento:new DateTime.now(),
+        esterilizado:true, color:"Café", fechaNacimiento:new DateTime.now(),
         observaciones:"Populars"),
     ];
     return aux;
@@ -35,7 +35,7 @@ class Animal{
 
   factory Animal.dePrueba(){
     return Animal(id:1, nombre:"Tom", especie:"Gato", raza:"Romano", sexo:'Macho',
-        esterilizado:false, color:"Blanco", fecha_nacimiento:new DateTime.now(),
+        esterilizado:false, color:"Blanco", fechaNacimiento:new DateTime.now(),
         observaciones:"Comprado en el modulo 15");
   }
 
@@ -43,15 +43,14 @@ class Animal{
   toString(){
     return
       "Id_Animal: ${id==null?'Undef':id}\n"+
-      "Nombre: ${nombre}\n"+
-      "Especie: ${especie}\n"+
-      "Sexo: ${sexo}\n"+
+      "Nombre: $nombre\n"+
+      "Especie: $especie\n"+
+      "Sexo: $sexo\n"+
       "esterilizado: ${esterilizado ==null?'Undef':esterilizado}\n"+
       "raza: ${raza ==null?'Undef':raza}\n"+
       "color: ${color ==null?'Undef':color}\n"+
-      "sexo: ${sexo ==null?'Undef':sexo}\n"+
       "observaciones: ${observaciones ==null?'Undef':observaciones}\n"+
-      "fecha_nacimiento: ${fecha_nacimiento ==null?'Undef':fechabonita(fecha_nacimiento!)}";
+      "fechaNacimiento: ${fechaNacimiento ==null?'Undef':fechabonita(fechaNacimiento!)}";
 
   }
 
@@ -63,8 +62,8 @@ class Animal{
     'esterilizado': (esterilizado==null?'false':esterilizado.toString()),
     'color': color==null?'No especificado':color,
     'observaciones': observaciones==null?'No especificado':observaciones,
-    //'fecha_nacimiento': DateTime.now().toIso8601String()
-    'fecha_nacimiento': fecha_nacimiento==null?null:fecha_nacimiento!.toIso8601String()
+    //'fechaNacimiento': DateTime.now().toIso8601String()
+    'fechaNacimiento': fechaNacimiento==null?null:fechaNacimiento!.toIso8601String()
   };
 
   factory Animal.fromJson(Map<String, dynamic> json) {
@@ -76,7 +75,7 @@ class Animal{
     print("Sexo: ${json['sexo']} tipo: ${json['sexo'].runtimeType}");
     print("Esterilizado: ${json['esterilizado']} tipo: ${json['esterilizado'].runtimeType}");
         print("color: ${json['color']} tipo: ${json['color'].runtimeType}");
-    print("fecha_nacimiento: ${json['fecha_nacimiento']} tipo: ${json['fecha_nacimiento'].runtimeType}");*/
+    print("fechaNacimiento: ${json['fechaNacimiento']} tipo: ${json['fechaNacimiento'].runtimeType}");*/
 
     return Animal(id: json['id_animal'],
                   nombre: json['nombre'],
@@ -85,8 +84,8 @@ class Animal{
                   sexo: json['sexo'],
                   esterilizado: json['esterilizado'],
                   color: json['color'],
-                  fecha_nacimiento: DateTime.parse(json['fecha_nacimiento']),
-                  //fecha_nacimiento: DateTime.now(),
+                  fechaNacimiento: json['fechaNacimiento']==null?null:DateTime.parse(json['fechaNacimiento']),
+                  //fechaNacimiento: DateTime.now(),
                   observaciones: json['observaciones']
     );
   }

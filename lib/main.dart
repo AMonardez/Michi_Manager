@@ -10,9 +10,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Maneja tus michis',
+      title: 'Maneja tus Michis',
       theme: ThemeData(
-        primarySwatch: Colors.lightGreen,
+        primarySwatch: Colors.lightBlue,
+        fontFamily: 'Nunito'
       ),
       darkTheme: ThemeData.dark(),
       home: MyHomePage(),
@@ -29,8 +30,17 @@ class MyHomePage extends StatelessWidget {
     int numeros=10;
     return Scaffold(
         drawer: MenuAnvorgueso(),
-        appBar: AppBar(
-          title: new Text(this.title),
+        appBar: AppBar(title: Text(this.title, style: TextStyle(color: Colors.white, fontFamily: 'Nunito') ),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: <Color>[Color(0xff48c6ef), Color(0xff6f86d6)
+                    ])
+            ),
+          ),
+
         ),
         body: Center(
             child: Column(

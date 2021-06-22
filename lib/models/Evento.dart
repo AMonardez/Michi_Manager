@@ -1,16 +1,16 @@
 class Evento{
-  int id_evento;
-  int id_animal;
+  int idEvento;
+  int idAnimal;
   String tipo;
   String nombre;
   String cantidad;
   DateTime fecha;
   bool cumplido;
 
-  Evento(this.id_evento, this.id_animal, this.tipo, this.nombre,
+  Evento(this.idEvento, this.idAnimal, this.tipo, this.nombre,
       this.cantidad, this.fecha, this.cumplido);
 
-  static List<Evento> lista_ejemplos(){
+  static List<Evento> listaEjemplos(){
     var aux=[
       new Evento(1,1, "Alimentación", "Whiskas", "200gr", DateTime.parse('2020-06-03 10:30:00'), true),
       new Evento(2,1, "Alimentación", "Whiskas", "200gr", DateTime.parse('2020-06-04 10:30:00'), true),
@@ -23,7 +23,7 @@ class Evento{
 
   @override
   String toString() {
-    return "Id_Evento: "+id_evento.toString() + "\nId_Animal: "+id_animal.toString()+
+    return "idEvento: "+idEvento.toString() + "\nidAnimal: "+idAnimal.toString()+
     "\nTipo: "+tipo +"\nNombre"+nombre+"\nCantidad:"+cantidad+"\nFecha"+fecha.toString()+
         "\nCumplido: "+cumplido.toString();
   }

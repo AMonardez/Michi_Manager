@@ -1,15 +1,16 @@
 import 'dart:convert';
 
-import 'animal.dart';
+import 'models/RegistroPeso.dart';
+import 'models/Animal.dart';
 import 'package:http/http.dart' as http;
 
 class API {
   static String servidor = 'http://18.219.209.248:5000';
 
-  static Future<Animal> getAnimal(int id_animal) async {
-    List<Animal> listilla;
+  static Future<Animal> getAnimal(int idAnimal) async {
+    //List<Animal> listilla;
     final response =
-        await http.get(Uri.parse(servidor + '/animal?id_animal=${id_animal}'));
+        await http.get(Uri.parse(servidor + '/animal?id_animal=$idAnimal'));
     print("Statuscode: ${response.statusCode}");
     if (response.statusCode == 200) {
       Map<String, dynamic> cosa = jsonDecode(response.body);
@@ -36,22 +37,20 @@ class API {
       //print(cosa['animales'].runtimeType);
       for(var d in cosa['animales']){
         //print(d.runtimeType);
-        //print(d.toString());
+        print(d.toString());
         //var f= jsonDecode(d);
         print("Coso del decode");
 
         listilla.add(Animal.fromJson(d));
       }
-      print(listilla.length);
+      //print(listilla.length);
       return listilla;//Animal.animales_de_prueba();
     } else {
       print("Statuscode: ${response.statusCode}");
       throw Exception('Falla al conectarse a la api.');
     }
-    return listilla;
+    //return listilla;
   }
-
-
 
   static Future<bool> guardarAnimal(Animal an) async {
     final response = await http.post(
@@ -62,6 +61,23 @@ class API {
       body: jsonEncode(an)
     );
     print(jsonEncode(an));
+    print("StatusCode: ${response.statusCode}");
+    print("Body:\n"+response.body);
+
+    if(response.statusCode==200)
+      return true;
+    else return false;
+  }
+
+  static Future<bool> guardarRegistroPeso(RegistroPeso rp) async {
+    final response = await http.post(
+        Uri.parse(servidor + '/registro_peso'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(rp)
+    );
+    print(jsonEncode(rp));
     print("StatusCode: ${response.statusCode}");
     print("Body:\n"+response.body);
 
