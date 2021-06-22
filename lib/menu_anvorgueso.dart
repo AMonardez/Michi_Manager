@@ -15,9 +15,23 @@ class MenuAnvorgueso extends StatelessWidget{
   Widget build(BuildContext context){
     return
       Drawer(
+
           child: ListView(children: <Widget>[
             DrawerHeader(
-              child: Text("Nombre usuario cuidador"),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom:15.0),
+                    child: CircleAvatar(backgroundColor: Color(0xff6f86d6),
+                      child: Text("NC", style:TextStyle(color: Colors.white, fontSize: 25)),
+                      /*backgroundImage: new AssetImage('fotos/logo.png'),*/
+                      radius: 40,
+                    ),
+                  ),
+                  Text("Nombre Cuidador", style: TextStyle(fontSize: 20)),
+                ],
+              ),
               decoration: BoxDecoration(color: Theme.of(context).primaryColor),
             ),
             AbsorbPointer(child: ListTile(title: Text('Animales'))),
@@ -78,7 +92,7 @@ class MenuAnvorgueso extends StatelessWidget{
             ),
             Divider(),
 
-            AbsorbPointer(child: ListTile(title: Text('Extras'))),
+            /*AbsorbPointer(child: ListTile(title: Text('Extras'))),
             ListTile(
               leading: Icon(Icons.precision_manufacturing_rounded),
               title: Text("Experimentos"),
@@ -87,7 +101,7 @@ class MenuAnvorgueso extends StatelessWidget{
                 Navigator.push(context, MaterialPageRoute(builder: (context) => Testeos()));
               },
             ),
-            Divider(),
+            Divider(),*/
             AbsorbPointer(child: ListTile(title: Text('Otros'))),
             ListTile(
               leading: Icon(Icons.info_rounded),

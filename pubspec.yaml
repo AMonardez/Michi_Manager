@@ -41,6 +41,7 @@ dependencies:
   ruler_picker: ^0.1.1
   http: ^0.13.3
   fl_chart: ^0.36.2
+  ionicons: ^0.1.2
 
 dev_dependencies:
   flutter_test:
