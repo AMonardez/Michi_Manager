@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'manage_cuidadores.dart';
 import 'models/Animal.dart';
 import 'API.dart';
+import 'models/Cuidador.dart';
 
 
 class ListaAnimales extends StatefulWidget {
@@ -15,10 +17,12 @@ class _ListaAnimalesState extends State<ListaAnimales> {
   late Future<List<Animal>> listadoanimalitos;
 
 
+
   @override
   initState(){
     super.initState();
-    listadoanimalitos = API.getAnimales();
+    listadoanimalitos = API.getMisAnimales("amonardezt@alumnosuls.cl", "1234");
+    //listadoanimalitos = API.getMisAnimales("claudio@andrade.cl", "1234");
   }
 
   @override
@@ -42,7 +46,12 @@ class _ListaAnimalesState extends State<ListaAnimales> {
               child: FutureBuilder<List<Animal>>(
                 future: listadoanimalitos,
                 builder: (context, snapshot){
-                  if (snapshot.hasData) {
+
+                  if(snapshot.hasData && snapshot.requireData.length == 0) return Padding(
+                    padding: const EdgeInsets.only(top:20, left: 15.0, right:15),
+                    child: Center(child: Text("No tienes animales a cargo.", style: TextStyle(color:Colors.grey))),
+                  );
+                    else if (snapshot.hasData) {
                     /*for(Animal a in snapshot.requireData) print (a.toString());*/
                     return new ListView.builder(
                       itemCount: snapshot.requireData.length,
@@ -80,6 +89,8 @@ class _ListaAnimalesState extends State<ListaAnimales> {
                                 title:Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    Text("ID:", style: TextStyle(fontWeight: FontWeight.bold)),
+                                    Text(snapshot.requireData[index].id!.toString()),
                                     Text("Sexo:", style: TextStyle(fontWeight: FontWeight.bold)),
                                     Text(snapshot.requireData[index].sexo),
                                     Text("Raza:", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -103,7 +114,34 @@ class _ListaAnimalesState extends State<ListaAnimales> {
                                           Spacer(flex:2),
                                           Icon(Icons.camera_alt),
                                           Spacer(flex: 2),
-                                          Icon(Icons.delete_forever),
+                                          InkWell(child: Icon(Icons.people),
+
+                                            onTap: () {
+                                                print(snapshot.requireData[index].nombre.toString());
+                                                //List<Cuidador> lcc= await API.getCuidadoresAnimal(snapshot.requireData[index].id!);
+                                                //for(var l in lcc) print(l.toString());
+                                                Navigator.push(context, MaterialPageRoute(builder: (context) => ManejaCuidadores(snapshot.requireData[index])));
+                                              }
+                                          ),
+                                          Spacer(flex: 2),
+                                          InkWell(child: Icon(Icons.delete_forever),
+                                          onTap: () async {
+                                            bool valor= await API.deleteAnimal(snapshot.requireData[index].id!);
+                                            if(valor){
+                                              snapshot.requireData.removeAt(index);
+                                              final snackbar = SnackBar(content: Text("Mascota eliminada."));
+                                              ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                                              setState(() {
+                                                listadoanimalitos = API.getMisAnimales("", "");
+                                              });
+                                            }
+                                            else{
+                                              final snackbar = SnackBar(content: Text("Error al eliminar a la mascota."));
+                                              ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                                            }
+
+
+                                          }),
                                           Spacer(flex:1),
 
 
@@ -125,7 +163,7 @@ class _ListaAnimalesState extends State<ListaAnimales> {
                   } else if (snapshot.hasError) {
                     return Text("${snapshot.error}");
                   }
-                  return CircularProgressIndicator();
+                  return Center(child: CircularProgressIndicator());
                 },
               ),
             ),
@@ -143,6 +181,64 @@ class _ListaAnimalesState extends State<ListaAnimales> {
 
         );
   }
+
+/*
+
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: Text("Confirme los datos"),
+              content: SingleChildScrollView(
+                  child: ListBody(children: [
+                    Text("ID animal:", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(idAnimal!),
+                    Text("Peso:", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(t.text),
+                    Text("Fecha:", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(fecha.toString()),
+                  ])),
+              actions: [
+                TextButton(
+                    child: Text(
+                      "CANCELAR",
+                      style: TextStyle(color: Theme.of(context).backgroundColor),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    }),
+                TextButton(child: Text("OK", style:TextStyle(color:Theme.of(context).accentColor)), onPressed:() async {
+                  RegistroPeso rp= RegistroPeso(fecha: fecha, idAnimal: int.parse(idAnimal!), peso: double.parse(t.text));
+                  bool resultado = await API.guardarRegistroPeso(rp);
+                  if(resultado){
+                    final snackbar = SnackBar(content: Text("Peso registrado exitosamente."));
+                    //TO-DO: Cambiar por ruta nombrada en vez de pop().
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    //Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                  }
+                  else {
+                    final snackbar = SnackBar(content: Text("Falló al registrar el peso."), backgroundColor: Colors.red);
+                    //TO-DO: Cambiar por ruta nombrada en vez de pop().
+                    Navigator.pop(context);
+                    //Navigator.pop(context);
+                    //Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+
+                  }
+
+                }
+                )
+              ]);
+        });
+  }
+*/
+
+
+
   static String fechabonita(DateTime dt){
     var stringList =  dt.toIso8601String().split(new RegExp(r"[T\.]"));
     var numeritos= stringList[0].split("-");

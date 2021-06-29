@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter_spinbox/flutter_spinbox.dart';
+import 'package:intl/intl.dart';
 
 import 'API.dart';
 import 'models/RegistroPeso.dart';
@@ -19,6 +20,8 @@ class _AddPesoState extends State<AddPeso> {
   String? idAnimal;
   var fecha = DateTime.now();
   double peso = 0.0;
+  Widget spb= SpinBox();
+  TextEditingController t= new TextEditingController();
 
   @override
   initState() {
@@ -73,10 +76,16 @@ class _AddPesoState extends State<AddPeso> {
                                 //icon: Icon(Icons.pets),
                                 hint: idAnimal == null ? Text("") : Text(idAnimal!),
                                 value: idAnimal,
-                                onChanged: (var value) {
+                                onChanged: (var value) async {
+                                  double pesillo= await API.getLastPeso(int.parse(value!));
                                   setState(() {
-                                    idAnimal = value!;
+                                    idAnimal = value;
+                                    peso=pesillo;
+                                    t.text= pesillo.toString();
+                                    t.text= NumberFormat("###.0", "en_US").format(pesillo);
+
                                   });
+                                  print("Se setea el estado? peso=$peso");
                                 },
                                 items: animalesPrueba.map((Animal an) {
                                   return DropdownMenuItem<String>(value: an.id.toString(), child: Text(an.nombre));
@@ -122,38 +131,69 @@ class _AddPesoState extends State<AddPeso> {
                               )),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: SpinBox(
-                              direction: Axis.horizontal,
-                              min: 0.0,
-                              max: 100.0,
-                              step: 0.1,
-                              enableInteractiveSelection: true,
-                              acceleration: 2.0,
-                              value: peso,
-                              onChanged: (value) => setState(() => peso = value),
-                              decimals: 1,
-                              showCursor: true,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
-                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
-                                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
-                                  disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
-                                  labelText: 'Peso',
-                                  suffixText: "kg",
-                                    hintText: "Escribe un numero",
-                                    /*helperText: "helpertext",
-                                    prefixText: "prefixtext",
-                                    counterText: 'Countertext'*/
+                            child:
 
-                                )
-                              /*decoration: InputDecoration(
-                                counterStyle:
-                                    TextStyle(color: Theme.of(context).accentColor, fontSize: 40),
+                            Column(
+                              children: [
+                                TextFormField(
+                                  controller : t,
+                                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                  textAlign: TextAlign.center,
+                                  decoration: InputDecoration(
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                      errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                      disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                      labelText: 'Peso',
 
 
-                              ),*/
+                                      suffixText: "kg",
+                                      hintText: "Escribe un numero",
+                                      prefixIcon: Icon(Icons.exposure_minus_1),
+                                      suffixIcon: Icon(Icons.plus_one),
+
+                                    ),
 
 
+                                ),
+
+
+                                /*SpinBox(
+                                  direction: Axis.horizontal,
+                                  min: 0.0,
+                                  max: 100.0,
+                                  step: 0.1,
+                                  enableInteractiveSelection: true,
+                                  acceleration: 2.0,
+                                  value: peso,
+                                  onChanged: (value) => setState(() => peso = value),
+                                  canChange: (value) => (value==peso)?false:true,
+
+                                  decimals: 1,
+                                  showCursor: true,
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                      errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                      disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                      labelText: 'Peso',
+                                      suffixText: "kg",
+                                        hintText: "Escribe un numero",
+                                        *//*helperText: "helpertext",
+                                        prefixText: "prefixtext",
+                                        counterText: 'Countertext'*//*
+
+                                    )
+                                  *//*decoration: InputDecoration(
+                                    counterStyle:
+                                        TextStyle(color: Theme.of(context).accentColor, fontSize: 40),
+
+
+                                  ),*//*
+
+
+                                ),*/
+                              ],
                             ),
                           ),
 
@@ -197,7 +237,7 @@ class _AddPesoState extends State<AddPeso> {
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       shape: StadiumBorder(),
                       onPressed: () {
-                        if (_formKey.currentState!.validate())_showMyDialog();},
+                        if (_formKey.currentState!.validate()) _showMyDialog();},
                       child: Text('Guardar Peso', style: TextStyle(fontSize: 25, color: Colors.white, fontFamily: 'Nunito'),)
                   ),
                 ),
@@ -219,7 +259,7 @@ class _AddPesoState extends State<AddPeso> {
                 Text("ID animal:", style: TextStyle(fontWeight: FontWeight.bold)),
                 Text(idAnimal!),
                 Text("Peso:", style: TextStyle(fontWeight: FontWeight.bold)),
-                Text(peso.toString()),
+                Text(t.text),
                 Text("Fecha:", style: TextStyle(fontWeight: FontWeight.bold)),
                 Text(fecha.toString()),
               ])),
@@ -233,22 +273,22 @@ class _AddPesoState extends State<AddPeso> {
                       Navigator.pop(context);
                     }),
                 TextButton(child: Text("OK", style:TextStyle(color:Theme.of(context).accentColor)), onPressed:() async {
-                  RegistroPeso rp= RegistroPeso(fecha: fecha, idAnimal: int.parse(idAnimal!), peso: peso);
+                  RegistroPeso rp= RegistroPeso(fecha: fecha, idAnimal: int.parse(idAnimal!), peso: double.parse(t.text));
                   bool resultado = await API.guardarRegistroPeso(rp);
                   if(resultado){
                     final snackbar = SnackBar(content: Text("Peso registrado exitosamente."));
                     //TO-DO: Cambiar por ruta nombrada en vez de pop().
                     Navigator.pop(context);
                     Navigator.pop(context);
-                    Navigator.pop(context);
+                    //Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(snackbar);
                   }
                   else {
                     final snackbar = SnackBar(content: Text("Falló al registrar el peso."), backgroundColor: Colors.red);
                     //TO-DO: Cambiar por ruta nombrada en vez de pop().
                     Navigator.pop(context);
-                    Navigator.pop(context);
-                    Navigator.pop(context);
+                    //Navigator.pop(context);
+                    //Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(snackbar);
 
                   }

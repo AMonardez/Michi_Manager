@@ -344,15 +344,15 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
                     //TO-DO: Cambiar por ruta nombrada en vez de pop().
                     Navigator.pop(context);
                     Navigator.pop(context);
-                    Navigator.pop(context);
+                    //Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(snackbar);
                   }
                   else {
                     final snackbar = SnackBar(content: Text("Falló al registrar la mascota."), backgroundColor: Colors.red);
                     //TO-DO: Cambiar por ruta nombrada en vez de pop().
                     Navigator.pop(context);
-                    Navigator.pop(context);
-                    Navigator.pop(context);
+                    //Navigator.pop(context);
+                    //Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(snackbar);
 
                   }

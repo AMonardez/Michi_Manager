@@ -24,9 +24,18 @@ class RegistroPeso{
     return aux;
   }
 
+  static List<RegistroPeso> listaPesos_Sinfuturo(int cuantos, int idanimal) {
+    List<RegistroPeso> aux=[];
+    for(int i =0; i<cuantos; i++){
+      aux.add(new RegistroPeso(fecha: DateTime.now().add(Duration(days:i)),
+          peso: (5+ i*2), idAnimal: idanimal));
+    }
+    return aux;
+  }
+
   @override
   String toString(){
-    return "Fecha: ${fecha.toIso8601String()} \n Peso: $peso \n idAnimal: $idAnimal\n";
+    return "Fecha: ${fecha.toIso8601String()}\nPeso: $peso\nidAnimal: $idAnimal\nObserv: $observaciones";
   }
 
   Map<String, dynamic>toJson() =>{

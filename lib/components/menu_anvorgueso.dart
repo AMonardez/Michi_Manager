@@ -1,35 +1,76 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:michi_manager/add_alimento.dart';
 
 import 'package:michi_manager/pantalla_eventos.dart';
-import 'package:michi_manager/test_screen.dart';
+import 'package:michi_manager/registrarse.dart';
 import 'package:michi_manager/viewListadoMascotas.dart';
 import 'package:michi_manager/viewGraficos.dart';
-import 'add_alimentacion.dart';
-import 'add_mascota.dart';
-import 'add_medicamento.dart';
-import 'add_peso.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../add_alimentacion.dart';
+import '../add_mascota.dart';
+import '../add_medicamento.dart';
+import '../add_peso.dart';
+import '../login.dart';
 
-class MenuAnvorgueso extends StatelessWidget{
+class MenuAnvorgueso extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() => MenuAnvorguesoState();
+}
+
+class MenuAnvorguesoState extends State<MenuAnvorgueso>{
+  late Future<String> nombre;
+  late Future<String> correo;
+  var f = SharedPreferences.getInstance();
+
+  @override
+  initState() {
+    super.initState();
+    nombre=getNombre();
+    correo=getCorreo();
+  }
+
+  Future<String> getNombre() async {
+    var p= await f;
+    return p.getString("nombre")??'Sinnombre';
+  }
+  Future<String> getCorreo() async {
+    var p= await f;
+    return p.getString("correo")??'sin@mail.fail';
+  }
+
   @override
   Widget build(BuildContext context){
     return
       Drawer(
-
           child: ListView(children: <Widget>[
             DrawerHeader(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(bottom:15.0),
+                    padding: const EdgeInsets.only(bottom:10.0),
                     child: CircleAvatar(backgroundColor: Color(0xff6f86d6),
-                      child: Text("NC", style:TextStyle(color: Colors.white, fontSize: 25)),
+                      child:FutureBuilder(
+                        future: nombre,
+                        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                          if(snapshot.hasData) return Text("${snapshot.data[0]}", style:TextStyle(color: Colors.white, fontSize: 25));
+                          else return Text("Error1234", style:TextStyle(color: Colors.red, fontSize: 25));
+                        },),
                       /*backgroundImage: new AssetImage('fotos/logo.png'),*/
                       radius: 40,
                     ),
                   ),
-                  Text("Nombre Cuidador", style: TextStyle(fontSize: 20)),
+                  FutureBuilder(future: nombre, builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                    if(snapshot.hasData) return Text("${snapshot.data}", style:TextStyle(color: Colors.white, fontSize: 20));
+                    else return Text("SinNombre", style:TextStyle(color: Colors.red, fontSize:20));
+                  },),
+                  //Text("Nombre Cuidador", style: TextStyle(fontSize: 20)),
+                  FutureBuilder(future: correo, builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                    if(snapshot.hasData) return Text("${snapshot.data}", style:TextStyle(color: Colors.white60, fontSize: 12));
+                    else return Text("sin@correo.cl", style:TextStyle(color: Colors.red, fontSize: 12));
+                  },),
+
                 ],
               ),
               decoration: BoxDecoration(color: Theme.of(context).primaryColor),
@@ -91,6 +132,30 @@ class MenuAnvorgueso extends StatelessWidget{
               },
             ),
             Divider(),
+            AbsorbPointer(child: ListTile(title: Text('Alimentos'))),
+            ListTile(
+              leading: Icon(Icons.add),
+              title: Text("Registrar alimento"),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AddAlimento()));
+              },
+            ),
+            Divider(),
+            AbsorbPointer(child: ListTile(title: Text('Logins'))),
+            ListTile(
+              leading: Icon(Icons.login),
+              title: Text("Login"),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.login),
+              title: Text("Registrarse"),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrarseScreen()));
+              },
+            ),
 
             /*AbsorbPointer(child: ListTile(title: Text('Extras'))),
             ListTile(

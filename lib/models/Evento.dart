@@ -13,12 +13,12 @@ class Evento{
 
   static List<Evento> listaEjemplos(){
     var aux=[
-      new Evento(1,1, "Alimentación",'Luna', "Whiskas", "200gr", DateTime.parse('2020-06-03 10:00:00'), true),
-      new Evento(2,1, "Alimentación", 'Luna',"Whiskas", "200gr", DateTime.parse('2020-06-03 18:00:00'), true),
+      new Evento(1,1, "Alimentación",'Luna', "Whiskas", "200gr", DateTime.parse('2020-01-03 10:00:00'), true),
+      new Evento(2,1, "Alimentación", 'Luna',"Whiskas", "200gr", DateTime.parse('2020-02-03 18:00:00'), true),
       new Evento(2,2, "Medicacion", "Poroto","Paracetamol", "10 mg", DateTime.parse('2020-06-03 20:00:00'), false),
-      new Evento(3,1, "Alimentación",'Luna',  "Whiskas", "200gr", DateTime.parse('2020-06-04 10:00:00'), false),
-      new Evento(1,2, "Alimentación",'Luna',  "Cachupin", "300gr", DateTime.parse('2020-06-04 18:00:00'), true),
-      new Evento(2,2, "Medicacion", "Poroto","Paracetamol", "10 mg", DateTime.parse('2020-06-04 20:00:00'), false),
+      new Evento(3,1, "Alimentación",'Luna',  "Whiskas", "200gr", DateTime.parse('2020-08-04 10:00:00'), false),
+      new Evento(1,2, "Alimentación",'Luna',  "Cachupin", "300gr", DateTime.parse('2020-06-04 18:00:00'), false),
+      new Evento(2,2, "Medicacion", "Poroto","Paracetamol", "10 mg", DateTime.parse('2020-12-04 20:00:00'), false),
 
     ];
     return aux;

@@ -1,15 +1,19 @@
+import 'dart:async';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 
 import 'package:michi_manager/models/RegistroPeso.dart';
+import 'API.dart';
 import 'models/Animal.dart';
 
 class ViewGraficos extends StatefulWidget{
   @override
   State<StatefulWidget> createState() => new ViewGraficosState();
-
 }
 
 class ViewGraficosState extends State<ViewGraficos>{
@@ -17,12 +21,14 @@ class ViewGraficosState extends State<ViewGraficos>{
   late List<Animal> animalesPrueba;
   late Future<List<RegistroPeso>> pesos;
 
-
-
   initState(){
     super.initState();
     animalesPrueba = Animal.animalesDePrueba();
-    pesos=RegistroPeso.listaPesos(10, 1);
+    //pesos=RegistroPeso.listaPesos(10, 1);
+    //pesos=new Future.value(RegistroPeso.listaPesos(10, 1));
+    //pesos=new Future.value([]);
+    pesos= new Future.value([]);
+    //pesos= new Future.delayed(Duration(seconds:5), ()=>[]);
   }
 
 
@@ -42,12 +48,13 @@ class ViewGraficosState extends State<ViewGraficos>{
       ),
 
       body:
-        ListView(
-          children:[
+        SingleChildScrollView(
+          child:
             Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(25.0),
+                  padding: const EdgeInsets.only(left:25.0, right:25, top: 20, bottom: 10),
                   child: Card(
                     elevation: 8.0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
@@ -56,7 +63,7 @@ class ViewGraficosState extends State<ViewGraficos>{
                       child: Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.only(top:8.0, bottom:0, right:8.0, left:0),
                             child: DropdownButtonFormField<String>(
                                 isExpanded: true,
                                 //icon: Icon(Icons.pets),
@@ -65,7 +72,8 @@ class ViewGraficosState extends State<ViewGraficos>{
                                 onChanged: (var value) async {
                                   setState(() {
                                     idAnimal = value!;
-                                    pesos= RegistroPeso.listaPesos(3, int.parse(value));
+                                    //pesos= RegistroPeso.listaPesos(3, int.parse(value));
+                                    pesos = API.getPesos(int.parse(value));
                                   });
                                 },
                                 items: animalesPrueba.map((Animal an) {
@@ -90,26 +98,82 @@ class ViewGraficosState extends State<ViewGraficos>{
                     ),
                   ),
                 ),
+
+                FutureBuilder<List<RegistroPeso>>(
+                  future: pesos,
+
+                  builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                    if(idAnimal==null) return Align(alignment: Alignment.center,child: Text("Seleccione una mascota para mostrar sus datos.", style: TextStyle(color: Colors.grey)));
+                    if(snapshot.connectionState==ConnectionState.waiting)
+                      return SizedBox(height:500, width:500,child: Center(child: CircularProgressIndicator()));
+                    if(snapshot.hasData)
+                      if(snapshot.data.length!=0)
+                      return Padding(
+                        padding: const EdgeInsets.only(left:25, right: 25, top:15),
+                        child: Card(
+                          elevation: 8.0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                DataTable(
+                                  columns: [
+                                    DataColumn(label: Center(child: Text("Fecha", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 17),),)),
+                                    DataColumn(label: Center(child: Text("Peso(kg)", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 17),),)),
+                                  ],
+                                  rows: snapshot.data.map<DataRow>(
+                                      (rp) => DataRow(
+                                        cells: [
+                                          DataCell(Text(fechabonita(rp.fecha))),
+                                          DataCell(Text(rp.peso.toString()))
+                                        ])
+                                  ).toList()
+                                ),
+
+
+
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                      else return Align(alignment: Alignment.center,child: Text("La mascota no tiene registros de peso.", style: TextStyle(color: Colors.grey)));
+                    else if (snapshot.hasError) {
+                    return SizedBox(
+                        height:500, width:500, child: Text("${snapshot.error}"));
+                    }
+                    else return SizedBox(height:500, width:500,child: Center(child: CircularProgressIndicator()));
+                  },),
+
+
                 SizedBox(
-                    height:200,
-                    width:200,
-                    child: Container(
-                      child: FutureBuilder( future: pesos,
-                        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                          if(snapshot.hasData){
-                            for(RegistroPeso r in snapshot.data) print(r);
-                            //return Text("OK");
-                            return LineChart( datos() );
-                          }
+                    height:500,
+                    width:1100,
+                    child: FutureBuilder( future: pesos,
+                      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                        if(snapshot.hasData && snapshot.data.length!=0){
+                          return Padding(
+                            padding: const EdgeInsets.all(25.0),
+                            child: Card(child: Padding(
 
-                          else if(snapshot.hasError) return Text("Ocurrio un error");
-                          else return CircularProgressIndicator();
+                              padding: const EdgeInsets.all(15.0),
+                              child:
+                              LineChart( datos(), ),
+                            ),
+                              elevation: 8.0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                            ),
+                          );
+                        }
+                        return SizedBox(width: 1,height: 1,);
+
+                        //else if(snapshot.hasError) return Text("Ocurrio un error");
+                        //else return CircularProgressIndicator();
 
 
-                        },
+                      },
 
-
-                      )
 
                     )
                 )
@@ -117,7 +181,6 @@ class ViewGraficosState extends State<ViewGraficos>{
               ]
             )
 
-          ]
         )
 
 
@@ -144,26 +207,26 @@ class ViewGraficosState extends State<ViewGraficos>{
         handleBuiltInTouches: true,
       ),
       gridData: FlGridData(
-        show: false,
+        show: true,
       ),
       titlesData: FlTitlesData(
         bottomTitles: SideTitles(
           showTitles: true,
           reservedSize: 22,
           getTextStyles: (value) => const TextStyle(
-            color: Color(0xff72719b),
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+            color: Color(0xff48c6ef),
+
+            fontSize: 14,
           ),
           margin: 10,
           getTitles: (value) {
             switch (value.toInt()) {
               case 2:
-                return 'SEPT';
+                return 'Abr';
               case 7:
-                return 'OCT';
+                return 'May';
               case 12:
-                return 'DEC';
+                return 'Jun';
             }
             return '';
           },
@@ -172,19 +235,19 @@ class ViewGraficosState extends State<ViewGraficos>{
           showTitles: true,
           getTextStyles: (value) => const TextStyle(
             color: Color(0xff75729e),
-            fontWeight: FontWeight.bold,
+
             fontSize: 14,
           ),
           getTitles: (value) {
             switch (value.toInt()) {
               case 1:
-                return '1m';
+                return '1kg';
               case 2:
-                return '2m';
+                return '2kg';
               case 3:
-                return '3m';
+                return '3kg';
               case 4:
-                return '5m';
+                return '4kg';
             }
             return '';
           },
@@ -196,11 +259,12 @@ class ViewGraficosState extends State<ViewGraficos>{
         show: true,
         border: const Border(
           bottom: BorderSide(
-            color: Color(0xff4e4965),
-            width: 4,
+            color: Color(0xff99999999),
+            width: 2,
           ),
           left: BorderSide(
-            color: Colors.transparent,
+            color: Color(0xff99999999),
+            width:2,
           ),
           right: BorderSide(
             color: Colors.transparent,
@@ -231,7 +295,7 @@ class ViewGraficosState extends State<ViewGraficos>{
       ],
       isCurved: true,
       colors: [
-        Colors.blue,
+        Color(0xff48c6ef),
       ],
       barWidth: 4,
       isStrokeCapRound: true,
@@ -245,6 +309,18 @@ class ViewGraficosState extends State<ViewGraficos>{
     return [
       lineChartBarData1,
     ];
+  }
+
+
+  static String fechabonita(DateTime dt){
+    /*var stringList =  dt.toIso8601String().split(new RegExp(r"[T\.]"));
+    var numeritos= stringList[0].split("-");
+    var horitas= stringList[1].split(":");
+    var fechabien = "" + numeritos[2] + "-" + numeritos[1] + '-' + numeritos[0] + " " + horitas[0] + ":" + horitas[1];
+    return fechabien;*/
+    //Intl.defaultLocale = 'en_ES';
+    initializeDateFormatting('es_US', null);
+    return DateFormat('dd-MMMM-yyyy', 'es_US').format(dt);
   }
 
 }

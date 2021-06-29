@@ -23,10 +23,10 @@ class Animal{
 
   static List<Animal> animalesDePrueba(){
     List<Animal> aux = [
-    new Animal(id:1, nombre:"Tom", especie:"Gato", raza:"Romano", sexo:'Macho',
+    new Animal(id:16, nombre:"Luna", especie:"Gato", raza:"Romano", sexo:'Macho',
         esterilizado:false, color:"Blanco", fechaNacimiento:new DateTime.now(),
         observaciones:"Comprado en el modulo 15"),
-    new Animal(id:2, nombre:"Chocolo", especie:"Perro", raza:"Quiltro", sexo:'Macho',
+    new Animal(id:18, nombre:"Poroto", especie:"Perro", raza:"Quiltro", sexo:'Macho',
         esterilizado:true, color:"Café", fechaNacimiento:new DateTime.now(),
         observaciones:"Populars"),
     ];
