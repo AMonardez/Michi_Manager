@@ -24,7 +24,7 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
   String? idAnimal;
   String nombreAnimal='';
   String tipoEvento = 'Alimentación';
-  String? periodo;
+  String periodo="Horas";
   var fechaInicio= DateTime.now();
   var fechaInicio2 = DateTime.now().toString();
 
@@ -260,15 +260,15 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
                               Flexible(
                                 flex:2,
                                 child: Container(
-                                  padding:EdgeInsets.only(left:8),
+                                  padding:EdgeInsets.only(left:8, top:5),
                                   height: 65,
                                   child: DropdownButtonFormField<String>(
                                     isExpanded: true,
-                                    hint: periodo == null ? Text("") : Text(periodo!),
+                                    hint: periodo == null ? Text("") : Text(periodo),
                                     value: periodo,
                                     onChanged: (var value) {
                                       setState(() {
-                                        periodo = value;
+                                        periodo = value??'';
                                       });
                                     },
                                     items: tiposPeriodos.map((String evnt) {
@@ -278,7 +278,7 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
                                         ? 'Seleccione periodo': null,
                                     //decoration: InputDecoration(enabledBorder: InputBorder.none,)
                                     decoration: InputDecoration(
-                                      prefixIcon: Icon(Icons.timer_10_sharp),
+                                      prefixIcon: Icon(Icons.view_week),
                                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
                                       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                       errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
@@ -355,7 +355,7 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
                     Text("Fecha de Inicio:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(fechabonita(fechaInicio)),
                     Text("Intervalo:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(intervaloController.text + " " +periodo! ),
+                    Text(intervaloController.text + " " +periodo),
                   ]
                   )
               ),
@@ -370,7 +370,7 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
                     dosis: cantidadController.text,
                     fechaInicio: fechaInicio,
                       idAnimal: int.parse(idAnimal!),
-                    periodicidad: intervaloController.text + " " +periodo!,
+                    periodicidad: intervaloController.text + " " +periodo,
                     observaciones: '-'
                   );
                   bool valor= await API.addPlanAlimentacion(p);

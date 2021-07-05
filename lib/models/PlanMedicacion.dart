@@ -22,7 +22,7 @@ class PlanMedicacion{
     "fecha_inicio": fechaInicio.toIso8601String(),
     "fecha_termino": fechaTermino.toIso8601String(),
     "id_animal": idAnimal.toString(),
-    "periodicidad": periodicidad,
+    "periodicidad": periodicidad.replaceAll('Horas', 'hours').replaceAll('Dias', 'days').replaceAll('Semanas','weeks'),
     "observaciones": observaciones,
   };
 

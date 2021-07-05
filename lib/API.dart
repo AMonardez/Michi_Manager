@@ -216,7 +216,7 @@ class API {
     String cont = f.getString("contrasena")??contrasena;
 
     final Map<String, String> bodo = {"correo": corr, "password": cont};
-    print("Hola");
+    //print("Hola");
     final response = await http.post(
         Uri.parse(servidor + '/login'),
         headers: <String, String>{
@@ -224,12 +224,13 @@ class API {
         },
         body: jsonEncode(bodo)
     );
-    print("Login de usuariooooooo");
+    //print("Login de usuariooooooo");
     //print(jsonEncode(bodo));
     print("StatusCode: ${response.statusCode}");
     //print("Body:\n"+response.body);
     if(response.statusCode==200 || response.statusCode==400){
       var coso = jsonDecode(response.body);
+      print(coso);
       for(var a in coso["result"]["animales_cuidador"])
         la.add(Animal.fromJson(a));
     }
@@ -381,8 +382,8 @@ class API {
         },
     );
     print("Get Timeline");
-    print("StatusCode: ${response.statusCode}");
-    //print("Body:\n"+response.body);
+    print("StatusCode: ${response.statusCode}(${response.reasonPhrase})");
+    print("Body:\n"+response.body);
     if(response.statusCode==200 || response.statusCode==400){
       var coso = jsonDecode(response.body);
       for(var a in coso["result"])
@@ -396,8 +397,9 @@ class API {
     print("cumplirEventoAlimentacion");
     var f = await SharedPreferences.getInstance();
     int idCuidador = f.getInt("id_cuidador")??0;
-    String nombreCuidador =f.getString("nombre")??"???";
-
+    String nombreCuidador ='.';
+    if(cumplido) nombreCuidador= f.getString("nombre")??'-';
+    else nombreCuidador = '-';
     Map<String, String> bodo = {
       "id_plan_alimentacion": idPlanAlimentacion.toString(),
       "fecha": fecha.toIso8601String(),

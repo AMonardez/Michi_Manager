@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:michi_manager/viewHome.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
 import 'login.dart';
 
 Future<bool> getLoginado() async {
+  WidgetsFlutterBinding.ensureInitialized();
   var f = SharedPreferences.getInstance();
   var p= await f;
   return p.containsKey("correo");
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Maneja tus Michis',
       theme: ThemeData(primarySwatch: Colors.lightBlue, fontFamily: 'Nunito'),
-      darkTheme: ThemeData.dark(),
+      darkTheme: ThemeData(primarySwatch: Colors.lightBlue, fontFamily: 'Nunito'),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate, // ONLY if it's a RTL language

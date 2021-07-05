@@ -50,8 +50,7 @@ class Animal{
       "raza: ${raza ==null?'Undef':raza}\n"+
       "color: ${color ==null?'Undef':color}\n"+
       "observaciones: ${observaciones ==null?'Undef':observaciones}\n"+
-      "fechaNacimiento: ${fechaNacimiento ==null?'Undef':fechabonita(fechaNacimiento!)}";
-
+      "fechaNacimiento: ${fechaNacimiento ==null?'Undef':fechaNacimiento!.toIso8601String()}";
   }
 
   Map<String, dynamic> toJson() => {
@@ -63,28 +62,18 @@ class Animal{
     'color': color==null?'No especificado':color,
     'observaciones': observaciones==null?'No especificado':observaciones,
     //'fechaNacimiento': DateTime.now().toIso8601String()
-    'fechaNacimiento': fechaNacimiento==null?null:fechaNacimiento!.toIso8601String()
+    'fecha_nacimiento': fechaNacimiento==null?null:fechaNacimiento!.toIso8601String()
   };
 
   factory Animal.fromJson(Map<String, dynamic> json) {
-    /*print("Convirtiendo de json");
-    print("idAnimal: ${json['id_animal']} tipo: ${json['id_animal'].runtimeType}");
-    print("Nombre: ${json['nombre']} tipo: ${json['nombre'].runtimeType}");
-    print("Especie: ${json['especie']} tipo: ${json['especie'].runtimeType}");
-    print("Raza: ${json['raza']} tipo: ${json['raza'].runtimeType}");
-    print("Sexo: ${json['sexo']} tipo: ${json['sexo'].runtimeType}");
-    print("Esterilizado: ${json['esterilizado']} tipo: ${json['esterilizado'].runtimeType}");
-        print("color: ${json['color']} tipo: ${json['color'].runtimeType}");
-    print("fechaNacimiento: ${json['fechaNacimiento']} tipo: ${json['fechaNacimiento'].runtimeType}");*/
-
-    return Animal(id: json['id_animal'],
+       return Animal(id: json['id_animal'],
                   nombre: json['nombre'],
                   especie:json['especie'],
                   raza: json['raza'],
                   sexo: json['sexo'],
                   esterilizado: json['esterilizado'],
                   color: json['color'],
-                  fechaNacimiento: json['fechaNacimiento']==null?null:DateTime.parse(json['fechaNacimiento']),
+                  fechaNacimiento: json['fecha_nacimiento']==null?null:DateTime.parse(json['fecha_nacimiento']),
                   //fechaNacimiento: DateTime.now(),
                   observaciones: json['observaciones']
     );
@@ -96,12 +85,5 @@ class Animal{
     return aux;
   }
 
-
-  static String fechabonita(DateTime dt){
-    var stringList =  dt.toIso8601String().split(new RegExp(r"[T\.]"));
-    var numeritos= stringList[0].split("-");
-    var fechabien = "" + numeritos[2] + "-" + numeritos[1] + '-' + numeritos[0];
-    return fechabien;
-  }
 
 }

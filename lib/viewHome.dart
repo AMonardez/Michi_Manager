@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timelines/timelines.dart';
 import 'package:line_icons/line_icons.dart';
 
@@ -47,7 +48,14 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
             future: listaEventos,
             builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
               if(snapshot.hasData){
-                return Timeline.tileBuilder(
+                if(snapshot.requireData.length==0) return
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                    Text("No tienes eventos pendientes."),
+                    Text("Prueba a agregar planes de alimentación o medicación.")]);
+                else return Timeline.tileBuilder(
                   theme: TimelineThemeData(
                     nodePosition: 0,
                     nodeItemOverlap: false,
@@ -90,10 +98,10 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
                                       children: [
                                         Text("Cantidad:", style: TextStyle(fontWeight: FontWeight.bold)),
                                         Text(snapshot.requireData[index].cantidad),
-                                        Text("idPlan:", style: TextStyle(fontWeight: FontWeight.bold)),
+                                        /*Text("idPlan:", style: TextStyle(fontWeight: FontWeight.bold)),
                                         Text(snapshot.requireData[index].idPlan.toString()),
                                         Text("idAnimal:", style: TextStyle(fontWeight: FontWeight.bold)),
-                                        Text(snapshot.requireData[index].idAnimal.toString()),
+                                        Text(snapshot.requireData[index].idAnimal.toString()),*/
                                         Text("Estado:", style: TextStyle(fontWeight: FontWeight.bold)),
                                         Text(snapshot.requireData[index].cumplido==true?"Cumplido":"Pendiente"),
                                         Text("Atendido por:", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -112,9 +120,14 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
                                             }
                                             else print("ERROR DE TIPO DE EVENTO.");
                                             if(valor){
+                                              String s= '';
+                                              var f = await SharedPreferences.getInstance();
+                                              s = f.getString("nombre")??'?';
+
                                               setState(() {
                                                 AsyncSnapshot<dynamic> snapshot2 = snapshot;
                                                 snapshot2.requireData[index].cumplido = !snapshot.requireData[index].cumplido;
+                                                snapshot2.requireData[index].nombreCuidador = s;
                                                 snapshot = snapshot2;
                                               });
                                             }
@@ -138,7 +151,7 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
                   ),
                 );
               }
-              else if(snapshot.hasError) return Text("No tienes eventos.");
+              else if(snapshot.hasError) return Text("Error al consultar eventos.");
               else return CircularProgressIndicator();
             },
 
