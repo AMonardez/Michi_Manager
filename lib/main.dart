@@ -29,8 +29,8 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Maneja tus Michis',
-      theme: ThemeData(primarySwatch: Colors.lightBlue, fontFamily: 'Nunito'),
-      darkTheme: ThemeData(primarySwatch: Colors.lightBlue, fontFamily: 'Nunito'),
+      theme: ThemeData(primarySwatch: Colors.lightBlue, fontFamily: 'Nunito', brightness: Brightness.light),
+      darkTheme: ThemeData(primarySwatch: Colors.lightBlue, fontFamily: 'Nunito', brightness: Brightness.dark),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate, // ONLY if it's a RTL language

@@ -199,7 +199,13 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
 
           ],
           onTap: (index) {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => paneles[index]));
+            if(index==1){
+              setState(() {
+                listaEventos = API.getTimeline();
+              });
+
+            }
+            else Navigator.push(context, MaterialPageRoute(builder: (context) => paneles[index]));
 
           }
 

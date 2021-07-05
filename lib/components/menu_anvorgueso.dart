@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-//import 'file:///C:/Users/aleja/AndroidStudioProjects/michi_manager/lib/otros/add_alimento.dart';
 
-import 'package:michi_manager/pantalla_eventos.dart';
 import 'package:michi_manager/registrarse.dart';
 import 'package:michi_manager/viewListadoMascotas.dart';
 import 'package:michi_manager/viewGraficos.dart';
@@ -19,6 +17,7 @@ class MenuAnvorgueso extends StatefulWidget{
 }
 
 class MenuAnvorguesoState extends State<MenuAnvorgueso>{
+  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   late Future<String> nombre;
   late Future<String> correo;
   late Future<int> id;
@@ -49,6 +48,7 @@ class MenuAnvorguesoState extends State<MenuAnvorgueso>{
   Widget build(BuildContext context){
     return
       Drawer(
+        key:_scaffoldKey,
           child: ListView(children: <Widget>[
             DrawerHeader(
               child: Column(
@@ -87,7 +87,10 @@ class MenuAnvorguesoState extends State<MenuAnvorgueso>{
               leading: Icon(Icons.add),
               title: Text("Agregar mascota"),
               onTap: () {
+                Navigator.pop(context);
                 Navigator.push(context, MaterialPageRoute(builder: (context) => AgregaPaciente()));
+
+
               },
             ),
             ListTile(
@@ -95,6 +98,7 @@ class MenuAnvorguesoState extends State<MenuAnvorgueso>{
               title: Text("Listado de Animales"),
               //title: Row(children: <Widget>[Icon(Ionicons.ios_rocket), Text("Experimentos")],),
               onTap: () {
+                Navigator.pop(context);
                 Navigator.push(context, MaterialPageRoute(builder: (context) => ListaAnimales()));
               },
             ),
@@ -104,6 +108,7 @@ class MenuAnvorguesoState extends State<MenuAnvorgueso>{
               leading: Icon(Icons.add),
               title: Text("Agregar Alimentación"),
               onTap: () {
+                Navigator.pop(context);
                 Navigator.push(context, MaterialPageRoute(builder: (context) => AddAlimentacion()));
               },
             ),
@@ -111,23 +116,25 @@ class MenuAnvorguesoState extends State<MenuAnvorgueso>{
               leading: Icon(Icons.add),
               title: Text("Agregar Medicación"),
               onTap: () {
+                Navigator.pop(context);
                 Navigator.push(context, MaterialPageRoute(builder: (context) => AddMedicamento()));
               },
             ),
-            ListTile(
+            /*ListTile(
               leading: Icon(Icons.playlist_add_check),
               title: Text("Ver eventos"),
               //title: Row(children: <Widget>[Icon(Ionicons.ios_rocket), Text("Experimentos")],),
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => PantallaEventos()));
               },
-            ),
+            ),*/
             Divider(),
             AbsorbPointer(child: ListTile(title: Text('Registro de Peso'))),
             ListTile(
               leading: Icon(Icons.add),
               title: Text("Agregar peso"),
               onTap: () {
+                Navigator.pop(context);
                 Navigator.push(context, MaterialPageRoute(builder: (context) => AddPeso()));
               },
             ),
@@ -135,10 +142,11 @@ class MenuAnvorguesoState extends State<MenuAnvorgueso>{
               leading: Icon(Icons.show_chart),
               title: Text("Gráficos de Peso"),
               onTap: () {
+                Navigator.pop(context);
                 Navigator.push(context, MaterialPageRoute(builder: (context) => ViewGraficos()));
               },
             ),
-            Divider(),
+            /*Divider(),
             AbsorbPointer(child: ListTile(title: Text('Alimentos'))),
             ListTile(
               leading: Icon(Icons.add),
@@ -146,13 +154,14 @@ class MenuAnvorguesoState extends State<MenuAnvorgueso>{
               onTap: () {
                 //Navigator.push(context, MaterialPageRoute(builder: (context) => AddAlimento()));
               },
-            ),
+            ),*/
             Divider(),
             AbsorbPointer(child: ListTile(title: Text('Logins'))),
             ListTile(
               leading: Icon(Icons.login),
               title: Text("Login"),
               onTap: () {
+                Navigator.pop(context);
                 Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
               },
             ),
@@ -160,6 +169,7 @@ class MenuAnvorguesoState extends State<MenuAnvorgueso>{
               leading: Icon(Icons.login),
               title: Text("Registrarse"),
               onTap: () {
+                Navigator.pop(context);
                 Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrarseScreen()));
               },
             ),

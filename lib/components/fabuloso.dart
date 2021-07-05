@@ -14,17 +14,26 @@ class Fabuloso extends StatefulWidget{
 }
 
 class EstadoFabuloso extends State<Fabuloso>{
+  final GlobalKey<FabCircularMenuState> fabKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     return FabCircularMenu(
-
-
+      key: fabKey,
         fabCloseIcon: Icon(Icons.close, color: Colors.white,),
         fabOpenIcon: Icon(Icons.add, color: Colors.white),
+        fabColor: Color(0xff48c6ef),
+        fabOpenColor: Color(0xff48c6ef),
+        fabCloseColor: Color(0xff48c6ef),
+        ringColor: Color(0xff48c6ef),
         children: <Widget>[
           InkWell(
             onTap: ( ) {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => AgregaPaciente()));},
+              Navigator.push(context, MaterialPageRoute(builder: (context) => AgregaPaciente()));
+              if (fabKey.currentState!.isOpen) fabKey.currentState!.close();
+              },
+
+
             child: SizedBox(width:80, height:80,
 
               child: Column(
@@ -38,6 +47,7 @@ class EstadoFabuloso extends State<Fabuloso>{
           InkWell(
             onTap: ( ) {
               Navigator.push(context, MaterialPageRoute(builder: (context) => AddAlimentacion()));
+              if (fabKey.currentState!.isOpen) fabKey.currentState!.close();
             },
             child: SizedBox(height:80, width:90,
               child: Column(
@@ -51,6 +61,7 @@ class EstadoFabuloso extends State<Fabuloso>{
           InkWell(
             onTap: ( ) {
               Navigator.push(context, MaterialPageRoute(builder: (context) => AddMedicamento()));
+              if (fabKey.currentState!.isOpen) fabKey.currentState!.close();
             },
             child: SizedBox(height:80, width:80,
               child: Column(
@@ -64,6 +75,7 @@ class EstadoFabuloso extends State<Fabuloso>{
           InkWell(
             onTap: ( ) {
               Navigator.push(context, MaterialPageRoute(builder: (context) => AddPeso()));
+              if (fabKey.currentState!.isOpen) fabKey.currentState!.close();
             },
             child: SizedBox(height:80, width:80,
               child: Column(
