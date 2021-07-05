@@ -131,7 +131,6 @@ class ViewGraficosState extends State<ViewGraficos>{
 
                 FutureBuilder<List<RegistroPeso>>(
                   future: pesos,
-
                   builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                     if(idAnimal==null) return Align(alignment: Alignment.center,child: Text("Seleccione una mascota para mostrar sus datos.", style: TextStyle(color: Colors.grey)));
                     if(snapshot.connectionState==ConnectionState.waiting)
@@ -160,9 +159,6 @@ class ViewGraficosState extends State<ViewGraficos>{
                                         ])
                                   ).toList()
                                 ),
-
-
-
                               ],
                             ),
                           ),
@@ -180,58 +176,46 @@ class ViewGraficosState extends State<ViewGraficos>{
                 SizedBox(
                     height:500,
                     width:1100,
-                    child: FutureBuilder( future: animalitos,
+                    child: FutureBuilder( future: pesos,
                       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                        if(snapshot.hasData && snapshot.data.length!=0){
+                        if(snapshot.hasData && snapshot.data.length>1){
                           return Padding(
                             padding: const EdgeInsets.all(25.0),
                             child: Card(child: Padding(
-
                               padding: const EdgeInsets.all(15.0),
-                              child:
-                              LineChart( datos(), ),
+                              child: LineChart( datos(snapshot.requireData)),
                             ),
                               elevation: 8.0,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
                             ),
                           );
                         }
-                        return SizedBox(width: 1,height: 1,);
-
+                        else if(snapshot.hasData && snapshot.data.length==1) return Text("No se disponen de registros suficientes para visualizar un gráfico.");
+                        else return SizedBox(width: 1,height: 1,);
                         //else if(snapshot.hasError) return Text("Ocurrio un error");
                         //else return CircularProgressIndicator();
-
-
                       },
-
-
                     )
                 )
-
               ]
             )
-
         )
-
-
-
-
-
-
-
-
-
-
-
     );
   }
 
 
-  LineChartData datos() {
+  LineChartData datos(List<RegistroPeso> lrp) {
     return LineChartData(
       lineTouchData: LineTouchData(
         touchTooltipData: LineTouchTooltipData(
           tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+          getTooltipItems: (t) {
+            return t.map((e)
+             {return LineTooltipItem("${
+                 fechabonita(DateTime.fromMillisecondsSinceEpoch(e.x.toInt()))
+             }\n${e.y.toStringAsFixed(1)} kg", TextStyle(color: Colors.white));}
+             ).toList();
+          },
         ),
         touchCallback: (LineTouchResponse touchResponse) {},
         handleBuiltInTouches: true,
@@ -244,45 +228,33 @@ class ViewGraficosState extends State<ViewGraficos>{
           showTitles: true,
           reservedSize: 22,
           getTextStyles: (value) => const TextStyle(
-            color: Color(0xff48c6ef),
-
-            fontSize: 14,
+            color: Color(0xff75729e),
+            fontSize: 10,
           ),
           margin: 10,
           getTitles: (value) {
-            switch (value.toInt()) {
-              case 2:
-                return 'Abr';
-              case 7:
-                return 'May';
-              case 12:
-                return 'Jun';
-            }
-            return '';
+            var d = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+            /*if(lrp.where((element) => element.fecha== d).isEmpty) return '';
+            else */return fechabonitacorta(d);
           },
+          rotateAngle: 270,
+          interval: getInterval(lrp),
+
         ),
         leftTitles: SideTitles(
           showTitles: true,
           getTextStyles: (value) => const TextStyle(
             color: Color(0xff75729e),
-
-            fontSize: 14,
+            fontSize: 10,
           ),
           getTitles: (value) {
-            switch (value.toInt()) {
-              case 1:
-                return '1kg';
-              case 2:
-                return '2kg';
-              case 3:
-                return '3kg';
-              case 4:
-                return '4kg';
-            }
-            return '';
+            /*if(lrp.where((element)=> element.peso==value).isEmpty) return '';
+            else*/ return '$value kg';
           },
-          margin: 8,
-          reservedSize: 30,
+          //margin: 8,
+          //reservedSize: 30,
+          interval: null,
+
         ),
       ),
       borderData: FlBorderData(
@@ -297,32 +269,44 @@ class ViewGraficosState extends State<ViewGraficos>{
             width:2,
           ),
           right: BorderSide(
-            color: Colors.transparent,
+              color: Color(0xff99999999),
+              width:2
           ),
           top: BorderSide(
-            color: Colors.transparent,
+              color: Color(0xff99999999),
+              width:2
           ),
         ),
       ),
-      minX: 0,
+      /*minX: 0,
       maxX: 14,
       maxY: 4,
-      minY: 0,
-      lineBarsData: linesBarData1(),
+      minY: 0,*/
+      lineBarsData: linesBarData1(lrp),
     );
   }
 
-  List<LineChartBarData> linesBarData1() {
+  List<LineChartBarData> linesBarData1(List<RegistroPeso> lrp) {
+    List<FlSpot> l=[];
+    l=lrp.map((rp) {
+      return FlSpot((rp.fecha.millisecondsSinceEpoch*1.0),rp.peso);
+    }
+    ).toList();
+
     final lineChartBarData1 = LineChartBarData(
-      spots: [
-        FlSpot(1, 1),
+      spots:l,
+      /*spots: [
+        *//*FlSpot(1, 1),
         FlSpot(3, 1.5),
         FlSpot(5, 1.4),
         FlSpot(7, 3.4),
         FlSpot(10, 2),
         FlSpot(12, 2.2),
-        FlSpot(13, 1.8),
-      ],
+        FlSpot(13, 1.8),*//*
+        FlSpot(1,DateTime.now().millisecondsSinceEpoch/1000),
+        FlSpot(2, DateTime.now().add(Duration(seconds: 10)).millisecondsSinceEpoch/1000),
+        FlSpot(3, DateTime.now().add(Duration(seconds: 20)).millisecondsSinceEpoch/1000),
+      ],*/
       isCurved: true,
       colors: [
         Color(0xff48c6ef),
@@ -330,7 +314,7 @@ class ViewGraficosState extends State<ViewGraficos>{
       barWidth: 4,
       isStrokeCapRound: true,
       dotData: FlDotData(
-        show: false,
+        show: true,
       ),
       belowBarData: BarAreaData(
         show: false,
@@ -346,5 +330,23 @@ class ViewGraficosState extends State<ViewGraficos>{
     initializeDateFormatting('es_US', null);
     return DateFormat('dd-MMMM-yyyy', 'es_US').format(dt);
   }
+  static String fechabonitacorta(DateTime dt){
+    initializeDateFormatting('es_US', null);
+    return DateFormat('dd-MMMM', 'es_US').format(dt);
+  }
+
+  double getInterval(List<RegistroPeso> lrp){
+    DateTime min = lrp.reduce((a,b) => a.fecha.millisecondsSinceEpoch>b.fecha.millisecondsSinceEpoch?b:a).fecha;
+    DateTime max = lrp.reduce((a,b) => a.fecha.millisecondsSinceEpoch<b.fecha.millisecondsSinceEpoch?b:a).fecha;
+    //print("Max ${fechabonita(max)}");
+    //print("Min ${fechabonita(min)}");
+    var calc =max.difference(min).inMilliseconds;
+    print ("Varcalc: $calc" );
+    double divisor = lrp.length>5?5.0:lrp.length-1*1.0;
+    return calc.toDouble()/divisor;
+
+  }
+
+
 
 }

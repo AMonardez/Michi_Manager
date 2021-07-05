@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ionicons/ionicons.dart';
+import 'package:line_icons/line_icons.dart';
 
 import 'manage_cuidadores.dart';
 import 'models/Animal.dart';
@@ -109,11 +111,11 @@ class _ListaAnimalesState extends State<ListaAnimales> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Spacer(flex:1),
-                                          Icon(Icons.edit),
+                                          Icon(LineIcons.drumstickWithBiteTakenOut),
                                           Spacer(flex:2),
-                                          Icon(Icons.camera_alt),
+                                          Icon(LineIcons.capsules),
                                           Spacer(flex: 2),
-                                          InkWell(child: Icon(Icons.people),
+                                          InkWell(child: Icon(LineIcons.nurse),
 
                                             onTap: () {
                                                 print(snapshot.requireData[index].nombre.toString());
@@ -123,7 +125,7 @@ class _ListaAnimalesState extends State<ListaAnimales> {
                                               }
                                           ),
                                           Spacer(flex: 2),
-                                          InkWell(child: Icon(Icons.delete_forever),
+                                          InkWell(child: Icon(LineIcons.trash),
                                           onTap: () async {
                                             bool valor= await API.deleteAnimal(snapshot.requireData[index].id!);
                                             if(valor){
