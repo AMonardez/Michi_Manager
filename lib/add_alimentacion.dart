@@ -2,6 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
+import 'package:michi_manager/models/PlanAlimentacion.dart';
+import 'API.dart';
 import 'models/Animal.dart';
 
 class AddAlimentacion extends StatefulWidget{
@@ -18,6 +22,7 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
   var tiposPeriodos = ["Horas", "Dias", "Semanas"];
   late List<Animal> animalesPrueba;
   String? idAnimal;
+  String nombreAnimal='';
   String tipoEvento = 'Alimentación';
   String? periodo;
   var fechaInicio= DateTime.now();
@@ -26,11 +31,14 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
   var repeticiones=0;
 
   TextEditingController intervaloController= new TextEditingController();
+  late Future<List<Animal>> animalitos;
 
   @override
   initState(){
     super.initState();
     animalesPrueba = Animal.animalesDePrueba();
+    animalitos = API.getMisAnimales('', '');
+    initializeDateFormatting('es_US', null);
   }
 
   @override
@@ -71,29 +79,56 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
                         ),*/
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: DropdownButtonFormField<String>(
-                            isExpanded: true,
-                            //icon: Icon(Icons.pets),
-                            hint: idAnimal == null ? Text("") : Text(idAnimal!),
-                            value: idAnimal,
-                            onChanged: (var value) {
-                              setState(() {
-                                idAnimal = value!;
-                              });
+                          child: FutureBuilder(
+                            future: animalitos,
+                            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                              if(snapshot.hasData){
+                                return DropdownButtonFormField<String>(
+                                      isExpanded: true,
+                                      //icon: Icon(Icons.pets),
+                                      hint: idAnimal == null ? Text("") : Text(idAnimal!),
+                                      value: idAnimal,
+                                      onChanged: (var value) {
+                                        setState(() {
+                                          idAnimal = value!;
+                                        });
+                                      },
+                                      items: snapshot.requireData.map<DropdownMenuItem<String>>((Animal an) {
+                                        return DropdownMenuItem<String>(value: an.id.toString(), child: Text(an.nombre),
+                                            onTap: () {nombreAnimal = an.nombre;}
+                                        );
+                                      }).toList(),
+                                      validator: (value) => value == null
+                                          ? 'Seleccione una mascota': null,
+                                      decoration: InputDecoration(
+                                        prefixIcon: Icon(Icons.pets),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                        errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                        disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                        labelText: "Mascota",
+                                      )
+
+                                  );
+                              }
+                              else if(snapshot.hasError){
+                                return Text("Error al cargar las mascotas.");
+                              }
+                              else {
+                                return DropdownButtonFormField(items: [],
+                                    decoration:
+                                InputDecoration(
+                                    prefixIcon: Icon(Icons.pets),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                    errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                    disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                    labelText: 'Cargando mascotas'
+                                )
+                                  );
+
+                              }
                             },
-                            items: animalesPrueba.map((Animal an) {
-                              return DropdownMenuItem<String>(value: an.id.toString(), child: Text(an.nombre));
-                            }).toList(),
-                            validator: (value) => value == null
-                                ? 'Seleccione una mascota': null,
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.pets),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                                errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
-                                disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
-                                labelText: "Mascota",
-                              )
 
                           ),
                         ),
@@ -106,8 +141,8 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
                               obscureText: false,
                               decoration: InputDecoration(
                                 prefixIcon: Icon(Icons.edit_rounded),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                 errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
                                 disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                 labelText: 'Nombre del Alimento',
@@ -131,8 +166,8 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
                               obscureText: false,
                               decoration: InputDecoration(
                                 prefixIcon: Icon(Icons.fastfood),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                 errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
                                 disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                 labelText: 'Cantidad (ej. 200gr)',
@@ -167,8 +202,10 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: DateTimePicker(
+                            dateMask: 'dd-MM-yyyy HH:mm',
+
                             type: DateTimePickerType.dateTime,
-                            initialValue: fechaInicio.toString(),
+                            initialValue: fechabonita(fechaInicio),
                             firstDate: DateTime(2015),
                             lastDate: DateTime(2100),
                             dateLabelText: 'Fecha de Inicio',
@@ -180,10 +217,9 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
                               decoration: InputDecoration(
                                 prefixIcon: Icon(Icons.calendar_today),
                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
-                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                 errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
-                                disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
-                                labelText: 'Fecha de Inicio',
+                                disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),labelText: 'Fecha de Inicio',
                               )
                             //onSaved: (val) => {fechaInicio = DateTime.parse(val!)},
                           )
@@ -205,11 +241,11 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
                                     obscureText: false,
                                     decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.timer),
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                       errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
                                       disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
-                                      labelText: 'Tiempo',
+                                      labelText: 'Cada',
                                     ),
                                     validator: (String? value){
                                       if (value == null || value.isEmpty) {
@@ -225,12 +261,10 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
                                 flex:2,
                                 child: Container(
                                   padding:EdgeInsets.only(left:8),
-
                                   height: 65,
-
                                   child: DropdownButtonFormField<String>(
                                     isExpanded: true,
-                                    hint: periodo == null ? Text("Periodo") : Text(periodo!),
+                                    hint: periodo == null ? Text("") : Text(periodo!),
                                     value: periodo,
                                     onChanged: (var value) {
                                       setState(() {
@@ -245,10 +279,11 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
                                     //decoration: InputDecoration(enabledBorder: InputBorder.none,)
                                     decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.timer_10_sharp),
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                       errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
                                       disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                      labelText: "Periodo",
 
                                     )
                                     //decoration: InputDecoration.collapsed(hintText:''),
@@ -256,13 +291,9 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
                                   ),
                               ),
 
-
                             ]
                           ),
                         )
-
-
-
 
                       ],
                     ),
@@ -272,8 +303,6 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
 
             ],
           ),
-
-
 
         ),
 
@@ -306,13 +335,8 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
           )
         ]
       )
-
     );
-
-
-
   }
-
 
   Future<void> _showMyDialog() async {
     return showDialog<void> (
@@ -322,21 +346,16 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
           return AlertDialog (title: Text("Confirme los datos"),
               content: SingleChildScrollView(
                   child: ListBody(children: [
-                    Text("Tipo de Evento:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(tipoEvento),
-                    Text("ID animal:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(idAnimal!),
+                    Text("Animal:", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text("$nombreAnimal (${idAnimal!})"),
                     Text("Nombre:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(nombreController.text),
                     Text("Cantidad:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(cantidadController.text),
                     Text("Fecha de Inicio:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(fechaInicio.toString()),
-                    Text("Repeticiones:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(repeticiones.toString()),
+                    Text(fechabonita(fechaInicio)),
                     Text("Intervalo:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(intervaloController.text + " " +periodo! ),
-
                   ]
                   )
               ),
@@ -345,19 +364,30 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
                   Navigator.pop(context);
                 }
                 ),
-                TextButton(child: Text("OK", style:TextStyle(color:Theme.of(context).accentColor)), onPressed:(){
-
-                  //TODO: Poner la llamada a la api aquí.
-
-                  final snackbar = SnackBar(
-                      content: Text("Evento guardado exitosamente.") );
-
-                  //TODO: Cambiar por ruta nombrada en vez de pop().
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(snackbar);
-
+                TextButton(child: Text("OK", style:TextStyle(color:Theme.of(context).accentColor)), onPressed:() async {
+                  PlanAlimentacion p= PlanAlimentacion(
+                    nombre: nombreController.text,
+                    dosis: cantidadController.text,
+                    fechaInicio: fechaInicio,
+                      idAnimal: int.parse(idAnimal!),
+                    periodicidad: intervaloController.text + " " +periodo!,
+                    observaciones: '-'
+                  );
+                  bool valor= await API.addPlanAlimentacion(p);
+                  if(valor){
+                    final snackbar = SnackBar(
+                        content: Text("Plan Alimentación guardado exitosamente."));
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    //Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                  }
+                  else {
+                    final snackbar = SnackBar(
+                        content: Text("Falló al guardar Plan de Alimentación."));
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                  }
                 }
                 )
               ]
@@ -367,13 +397,9 @@ class _AddAlimentacionState extends State<AddAlimentacion>{
     );
   }
 
-
-
-  String fechabonita(DateTime dt){
-    var stringList =  dt.toIso8601String().split(new RegExp(r"[T\.]"));
-    var numeritos= stringList[0].split("-");
-    var fechabien = "" + numeritos[2] + "-" + numeritos[1] + '-' + numeritos[0];
-    return fechabien;
+  static String fechabonita(DateTime dt){
+    initializeDateFormatting('es_US', null);
+    return DateFormat('dd-MM-yyyy HH:mm', 'es_US').format(dt);
   }
 
 }

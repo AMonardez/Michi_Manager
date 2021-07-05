@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:michi_manager/add_alimento.dart';
+//import 'file:///C:/Users/aleja/AndroidStudioProjects/michi_manager/lib/otros/add_alimento.dart';
 
 import 'package:michi_manager/pantalla_eventos.dart';
 import 'package:michi_manager/registrarse.dart';
@@ -21,6 +21,7 @@ class MenuAnvorgueso extends StatefulWidget{
 class MenuAnvorguesoState extends State<MenuAnvorgueso>{
   late Future<String> nombre;
   late Future<String> correo;
+  late Future<int> id;
   var f = SharedPreferences.getInstance();
 
   @override
@@ -28,6 +29,7 @@ class MenuAnvorguesoState extends State<MenuAnvorgueso>{
     super.initState();
     nombre=getNombre();
     correo=getCorreo();
+    id=getId();
   }
 
   Future<String> getNombre() async {
@@ -37,6 +39,10 @@ class MenuAnvorguesoState extends State<MenuAnvorgueso>{
   Future<String> getCorreo() async {
     var p= await f;
     return p.getString("correo")??'sin@mail.fail';
+  }
+  Future<int> getId() async {
+    var p= await f;
+    return p.getInt("id_cuidador")??-1;
   }
 
   @override
@@ -52,17 +58,18 @@ class MenuAnvorguesoState extends State<MenuAnvorgueso>{
                     padding: const EdgeInsets.only(bottom:10.0),
                     child: CircleAvatar(backgroundColor: Color(0xff6f86d6),
                       child:FutureBuilder(
-                        future: nombre,
+                        future: nombre ,
                         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                          if(snapshot.hasData) return Text("${snapshot.data[0]}", style:TextStyle(color: Colors.white, fontSize: 25));
+                          if(snapshot.hasData) return Text("${snapshot.requireData[0]}", style:TextStyle(color: Colors.white, fontSize: 30));
                           else return Text("Error1234", style:TextStyle(color: Colors.red, fontSize: 25));
                         },),
                       /*backgroundImage: new AssetImage('fotos/logo.png'),*/
                       radius: 40,
                     ),
                   ),
-                  FutureBuilder(future: nombre, builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                    if(snapshot.hasData) return Text("${snapshot.data}", style:TextStyle(color: Colors.white, fontSize: 20));
+                  FutureBuilder(future: Future.wait([nombre,id]),
+                    builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+                    if(snapshot.hasData) return Text("${snapshot.requireData[0]} (#${snapshot.requireData[1]})", style:TextStyle(color: Colors.white, fontSize: 20));
                     else return Text("SinNombre", style:TextStyle(color: Colors.red, fontSize:20));
                   },),
                   //Text("Nombre Cuidador", style: TextStyle(fontSize: 20)),
@@ -137,7 +144,7 @@ class MenuAnvorguesoState extends State<MenuAnvorgueso>{
               leading: Icon(Icons.add),
               title: Text("Registrar alimento"),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => AddAlimento()));
+                //Navigator.push(context, MaterialPageRoute(builder: (context) => AddAlimento()));
               },
             ),
             Divider(),

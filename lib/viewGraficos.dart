@@ -20,10 +20,12 @@ class ViewGraficosState extends State<ViewGraficos>{
   String? idAnimal;
   late List<Animal> animalesPrueba;
   late Future<List<RegistroPeso>> pesos;
+  late Future<List<Animal>> animalitos;
 
   initState(){
     super.initState();
     animalesPrueba = Animal.animalesDePrueba();
+    animalitos = API.getMisAnimales('', '');
     //pesos=RegistroPeso.listaPesos(10, 1);
     //pesos=new Future.value(RegistroPeso.listaPesos(10, 1));
     //pesos=new Future.value([]);
@@ -64,31 +66,59 @@ class ViewGraficosState extends State<ViewGraficos>{
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(top:8.0, bottom:0, right:8.0, left:0),
-                            child: DropdownButtonFormField<String>(
-                                isExpanded: true,
-                                //icon: Icon(Icons.pets),
-                                hint: idAnimal == null ? Text("") : Text(idAnimal!),
-                                value: idAnimal,
-                                onChanged: (var value) async {
-                                  setState(() {
-                                    idAnimal = value!;
-                                    //pesos= RegistroPeso.listaPesos(3, int.parse(value));
-                                    pesos = API.getPesos(int.parse(value));
-                                  });
-                                },
-                                items: animalesPrueba.map((Animal an) {
-                                  return DropdownMenuItem<String>(value: an.id.toString(), child: Text(an.nombre));
-                                }).toList(),
-                                validator: (value) => value == null
-                                    ? 'Seleccione una mascota': null,
-                                decoration: InputDecoration(
-                                    prefixIcon: Icon(Icons.pets),
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
-                                    errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
-                                    disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
-                                    labelText: 'Mascota'
-                                )
+                            child: FutureBuilder(
+                              future: animalitos,
+                              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                                if(snapshot.hasData){
+                                  return DropdownButtonFormField<String>(
+                                      isExpanded: true,
+                                      //icon: Icon(Icons.pets),
+                                      hint: idAnimal == null ? Text("") : Text(idAnimal!),
+                                      value: idAnimal,
+                                      onChanged: (var value) async {
+                                        setState(() {
+                                          idAnimal = value!;
+                                          //pesos= RegistroPeso.listaPesos(3, int.parse(value));
+                                          pesos = API.getPesos(int.parse(value));
+                                        });
+                                      },
+                                      items: snapshot.requireData.map<DropdownMenuItem<String>>((Animal an) {
+                                        return DropdownMenuItem<String>(value: an.id.toString(), child: Text(an.nombre));
+                                      }).toList(),
+                                      validator: (value) => value == null
+                                          ? 'Seleccione una mascota': null,
+                                      decoration: InputDecoration(
+                                          prefixIcon: Icon(Icons.pets),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                          errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                          disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                          labelText: 'Mascota'
+                                      )
+
+                                  );
+
+                                }
+                                else{
+                                  return
+                                    TextField(enabled: false,
+                                        decoration:
+                                        InputDecoration(
+                                            prefixIcon: Icon(Icons.pets),
+                                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                            errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                            disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                            labelText: 'Cargando mascotas'
+                                        )
+
+
+                                    );
+
+
+                                }
+
+                              },
 
                             ),
                           ),
@@ -150,7 +180,7 @@ class ViewGraficosState extends State<ViewGraficos>{
                 SizedBox(
                     height:500,
                     width:1100,
-                    child: FutureBuilder( future: pesos,
+                    child: FutureBuilder( future: animalitos,
                       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                         if(snapshot.hasData && snapshot.data.length!=0){
                           return Padding(
@@ -313,12 +343,6 @@ class ViewGraficosState extends State<ViewGraficos>{
 
 
   static String fechabonita(DateTime dt){
-    /*var stringList =  dt.toIso8601String().split(new RegExp(r"[T\.]"));
-    var numeritos= stringList[0].split("-");
-    var horitas= stringList[1].split(":");
-    var fechabien = "" + numeritos[2] + "-" + numeritos[1] + '-' + numeritos[0] + " " + horitas[0] + ":" + horitas[1];
-    return fechabien;*/
-    //Intl.defaultLocale = 'en_ES';
     initializeDateFormatting('es_US', null);
     return DateFormat('dd-MMMM-yyyy', 'es_US').format(dt);
   }

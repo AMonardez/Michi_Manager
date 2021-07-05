@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'manage_cuidadores.dart';
 import 'models/Animal.dart';
 import 'API.dart';
-import 'models/Cuidador.dart';
-
 
 class ListaAnimales extends StatefulWidget {
   @override
@@ -15,6 +13,7 @@ class ListaAnimales extends StatefulWidget {
 class _ListaAnimalesState extends State<ListaAnimales> {
   late Future<Animal> an;
   late Future<List<Animal>> listadoanimalitos;
+  late var proveedor;
 
 
 
@@ -22,7 +21,7 @@ class _ListaAnimalesState extends State<ListaAnimales> {
   initState(){
     super.initState();
     listadoanimalitos = API.getMisAnimales("amonardezt@alumnosuls.cl", "1234");
-    //listadoanimalitos = API.getMisAnimales("claudio@andrade.cl", "1234");
+    //listadoanimalitos = Provider.of<MascotasProvider>(context).refrescar;
   }
 
   @override

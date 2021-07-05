@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 import 'models/Animal.dart';
 import 'API.dart';
@@ -213,6 +215,7 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: DateTimePicker(
                                         icon: Icon(Icons.calendar_today),
+                                        dateMask: 'dd-MM-yyyy',
                                         type: DateTimePickerType.date,
                                         initialValue: fechaNacimiento.toString(),
                                         firstDate: DateTime(2015),
@@ -366,11 +369,9 @@ class _AgregaPacienteState extends State<AgregaPaciente> {
     );
   }
 
-  String fechabonita(DateTime dt){
-    var stringList =  dt.toIso8601String().split(new RegExp(r"[T\.]"));
-    var numeritos= stringList[0].split("-");
-    var fechabien = "" + numeritos[2] + "-" + numeritos[1] + '-' + numeritos[0];
-    return fechabien;
+  static String fechabonita(DateTime dt){
+    initializeDateFormatting('es_US', null);
+    return DateFormat('dd-MMMM-yyyy HH:mm', 'es_US').format(dt);
   }
 
 }

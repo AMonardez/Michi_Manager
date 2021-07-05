@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:michi_manager/models/Cuidador.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'models/Evento.dart';
+import 'models/PlanAlimentacion.dart';
+import 'models/PlanMedicacion.dart';
 import 'models/RegistroPeso.dart';
 import 'models/Animal.dart';
 import 'package:http/http.dart' as http;
@@ -104,7 +107,7 @@ class API {
       //print(response.body);
       if(cosa['ok']==false) {
         print("El animal seleccionado no tiene registro de peso.");
-        return -99.9;
+        return 0;
       }
       else{
         print("El peso de la mascota de id $idAnimal es de ${cosa["registro_peso"]["peso"]}");
@@ -148,7 +151,7 @@ class API {
     } else {
       print("Statuscode: ${response.statusCode}");
       throw Exception('Falla al conectarse a la api.');
-      return [];
+      //return [];
     }
   }
 
@@ -195,6 +198,10 @@ class API {
         f.setString("nombre", coso["result"]["nombre"]);
         f.setString("correo", correo);
         f.setString("contrasena", contrasena);
+        f.setInt("id_cuidador", coso["result"]["id_cuidador"]);
+        print(f.getString("nombre"));
+        print(f.getString("correo"));
+        print(f.getInt("id_cuidador"));
       }
 
       return coso["ok"];
@@ -218,9 +225,9 @@ class API {
         body: jsonEncode(bodo)
     );
     print("Login de usuariooooooo");
-    print(jsonEncode(bodo));
+    //print(jsonEncode(bodo));
     print("StatusCode: ${response.statusCode}");
-    print("Body:\n"+response.body);
+    //print("Body:\n"+response.body);
     if(response.statusCode==200 || response.statusCode==400){
       var coso = jsonDecode(response.body);
       for(var a in coso["result"]["animales_cuidador"])
@@ -228,7 +235,6 @@ class API {
     }
     return la;
   }
-
 
   static Future<bool> deleteAnimal(int idAnimal) async {
     //List<Animal> listilla;
@@ -241,10 +247,9 @@ class API {
       return cosa["ok"];
     } else {
       print("Statuscode: ${response.statusCode}");
-      throw Exception('Falla al conectarse a la api.');
       return false;
+      //throw Exception('Falla al conectarse a la api.');
     }
-    //return Animal(nombre:'Cachupin', especie: 'Perro', sexo: 'Macho');
   }
 
   static Future<List<Cuidador>> getCuidadoresAnimal(int idAnimal) async {
@@ -310,11 +315,156 @@ class API {
       return cosa["ok"];
     } else {
       print("Statuscode: ${response.statusCode}");
-      throw Exception('Falla al conectarse a la api.');
+      //throw Exception('Falla al conectarse a la api.');
       return false;
     }
-    //return Animal(nombre:'Cachupin', especie: 'Perro', sexo: 'Macho');
   }
+
+  static Future<bool> addPlanAlimentacion(PlanAlimentacion pa) async {
+    String endpoint = "/plan_alimentacion";
+    print("AddPlanAlimentacion");
+    print(pa.toString());
+
+    final response = await http.post(
+        Uri.parse(servidor + endpoint),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(pa)
+    );
+    print("Statuscode: ${response.statusCode}");
+    if(response.statusCode == 200 || response.statusCode==400) {
+      Map<String, dynamic> cosa = jsonDecode(response.body);
+      print(response.body);
+      return cosa["ok"];
+    } else {
+      print("Statuscode: ${response.statusCode}");
+      print("Falla al conectarse a la api");
+      return false;
+      //throw Exception('Falla al conectarse a la api.');
+    }
+  }
+
+  static Future<bool> addPlanMedicacion(PlanMedicacion pm) async {
+    String endpoint = "/medicamento";
+    print("AddPlanMedicacion");
+    print(pm.toString());
+
+    final response = await http.post(
+        Uri.parse(servidor + endpoint),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(pm)
+    );
+    print("Statuscode: ${response.statusCode}");
+    if(response.statusCode == 200 || response.statusCode==400) {
+      Map<String, dynamic> cosa = jsonDecode(response.body);
+      print(response.body);
+      return cosa["ok"];
+    } else {
+      print("Statuscode: ${response.statusCode}");
+      print("Falla al conectarse a la api");
+      return false;
+      //throw Exception('Falla al conectarse a la api.');
+    }
+  }
+
+  static Future<List<Evento>> getTimeline() async {
+    List<Evento> tm=[];
+    var f = await SharedPreferences.getInstance();
+    int idCuidador = f.getInt("id_cuidador")??0;
+    final response = await http.get(
+        Uri.parse(servidor + '/linea_temporal_cuidador?id_cuidador=$idCuidador'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+    );
+    print("Get Timeline");
+    print("StatusCode: ${response.statusCode}");
+    //print("Body:\n"+response.body);
+    if(response.statusCode==200 || response.statusCode==400){
+      var coso = jsonDecode(response.body);
+      for(var a in coso["result"])
+        tm.add(Evento.fromJson(a));
+    }
+    return tm;
+  }
+
+  static Future<bool> cumplirEventoAlimentacion(int idPlanAlimentacion, DateTime fecha, bool cumplido ) async {
+    String endpoint = "/registro_plan_alimentacion";
+    print("cumplirEventoAlimentacion");
+    var f = await SharedPreferences.getInstance();
+    int idCuidador = f.getInt("id_cuidador")??0;
+    String nombreCuidador =f.getString("nombre")??"???";
+
+    Map<String, String> bodo = {
+      "id_plan_alimentacion": idPlanAlimentacion.toString(),
+      "fecha": fecha.toIso8601String(),
+      "id_cuidador": idCuidador.toString(),
+      "observaciones": "-",
+      "cumplido": cumplido.toString(),
+      "nombre_cuidador": nombreCuidador,
+    };
+
+    final response = await http.post(
+        Uri.parse(servidor + endpoint),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(bodo)
+    );
+    print("Statuscode: ${response.statusCode}");
+    if(response.statusCode == 200 || response.statusCode==400) {
+      Map<String, dynamic> cosa = jsonDecode(response.body);
+      print(response.body);
+      return cosa["ok"];
+    } else {
+      print("Statuscode: ${response.statusCode}");
+      print("Falla al conectarse a la api");
+      return false;
+      //throw Exception('Falla al conectarse a la api.');
+    }
+  }
+
+  static Future<bool> cumplirEventoMedicacion(int idMedicamento, DateTime fecha, bool cumplido ) async {
+    String endpoint = "/medicamentos_suministrados";
+    print("cumplirEventoMedicacion");
+    var f = await SharedPreferences.getInstance();
+    int idCuidador = f.getInt("id_cuidador")??0;
+    String nombreCuidador =f.getString("nombre")??"???";
+
+    Map<String, String> bodo = {
+      "id_medicamento": idMedicamento.toString(),
+      "fecha": fecha.toIso8601String(),
+      "id_cuidador": idCuidador.toString(),
+      "observaciones": "-",
+      "cumplido": cumplido.toString(),
+      "nombre_cuidador": nombreCuidador,
+    };
+
+    final response = await http.post(
+        Uri.parse(servidor + endpoint),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(bodo)
+    );
+    print("Statuscode: ${response.statusCode}");
+    if(response.statusCode == 200 || response.statusCode==400) {
+      Map<String, dynamic> cosa = jsonDecode(response.body);
+      print(response.body);
+      return cosa["ok"];
+    } else {
+      print("Statuscode: ${response.statusCode}");
+      print("Falla al conectarse a la api");
+      return false;
+      //throw Exception('Falla al conectarse a la api.');
+    }
+  }
+
+
+
 
 
 

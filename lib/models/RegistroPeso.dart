@@ -24,7 +24,7 @@ class RegistroPeso{
     return aux;
   }
 
-  static List<RegistroPeso> listaPesos_Sinfuturo(int cuantos, int idanimal) {
+  static List<RegistroPeso> listaPesosSinfuturo(int cuantos, int idanimal) {
     List<RegistroPeso> aux=[];
     for(int i =0; i<cuantos; i++){
       aux.add(new RegistroPeso(fecha: DateTime.now().add(Duration(days:i)),

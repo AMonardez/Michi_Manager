@@ -15,7 +15,19 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formaRegistroKey = new GlobalKey<FormState>();
   var correo = new TextEditingController();
   var contrasena = new TextEditingController();
+  var f = SharedPreferences.getInstance();
 
+  @override
+  initState(){
+    super.initState();
+    autologin();
+  }
+
+  Future<void> autologin() async {
+    var p= await f;
+    correo.text=p.getString("correo")??'';
+    contrasena.text=p.getString("contrasena")??'';
+  }
 
   Widget _buildLoginBtn() {
     return Container(
@@ -32,16 +44,18 @@ class _LoginScreenState extends State<LoginScreen> {
             bool loginado = await API.loginCuidador(correo.text, contrasena.text);
             if(loginado){
               final snackbar = SnackBar(content: Text("Login exitoso."));
-              //ScaffoldMessenger.of(context).showSnackBar(snackbar);
               //Navigator.pop(context);
-              SharedPreferences pfs= await SharedPreferences.getInstance();
+              //SharedPreferences pfs= await SharedPreferences.getInstance();
               //pfs.setString("usuario", correo.text);
               //pfs.setString("contrasena", contrasena.text);
+              //Navigator.pop(context);
               Navigator.push(context, MaterialPageRoute(builder: (context) => PaginaPrincipal()));
+              ScaffoldMessenger.of(context).showSnackBar(snackbar);
             }
             else {
               final snackbar = SnackBar(content: Text("Credenciales Incorrectas."));
               //Navigator.pop(context);
+              print("Credenciales incorrectas.");
               ScaffoldMessenger.of(context).showSnackBar(snackbar);
             }
           }

@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'models/Evento.dart';
+import 'package:michi_manager/models/Evento.dart';
 
 class ListaEventos extends StatefulWidget{
   @override
@@ -31,7 +29,7 @@ class ListaEventosState extends State<ListaEventos>{
         itemBuilder: (BuildContext context, int index)
         {
           return new CheckboxListTile(
-            title: Text(listaEventos[index].nombre),
+            title: Text(listaEventos[index].nombreEvento),
             subtitle: Text(/*listaEventos[index].fecha.toString() +*/
 
                 listaEventos[index].fecha.day.toString() + "/" + listaEventos[index].fecha.month.toString()+
@@ -41,7 +39,7 @@ class ListaEventosState extends State<ListaEventos>{
                 (listaEventos[index].cumplido?"Cumplido":"Pendiente")
                 + ")"),
             value: listaEventos[index].cumplido,
-            secondary: listaEventos[index].tipo=='Alimentación'?Icon(Icons.fastfood):Icon(Icons.medical_services),
+            secondary: listaEventos[index].tipoEvento=='Alimentación'?Icon(Icons.fastfood):Icon(Icons.medical_services),
             onChanged: (bool? value) { //if(value!=null) listaEventos[index].cumplido=value;
             setState(() {
               List<Evento> aux= listaEventos;

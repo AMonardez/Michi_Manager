@@ -2,6 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
+import 'package:michi_manager/models/PlanMedicacion.dart';
+import 'API.dart';
 import 'models/Animal.dart';
 
 class AddMedicamento extends StatefulWidget{
@@ -26,12 +30,15 @@ class _AddMedicamentoState extends State<AddMedicamento> {
   TextEditingController intervaloCadaController = new TextEditingController();
   TextEditingController intervaloDuranteController = new TextEditingController();
 
+  late Future<List<Animal>> animalitos;
+
+  String nombreAnimal='';
+
   @override
   initState() {
     super.initState();
     animalesPrueba = Animal.animalesDePrueba();
-    for (Animal animal in animalesPrueba)
-      print(animal.toString());
+    animalitos = API.getMisAnimales('', '');
   }
 
   @override
@@ -73,30 +80,56 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                         ),*/
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: DropdownButtonFormField<String>(
-                              isExpanded: true,
-                              //icon: Icon(Icons.pets),
-                              hint: idAnimal == null ? Text("") : Text(idAnimal!),
-                              value: idAnimal,
-                              onChanged: (var value) {
-                                setState(() {
-                                  idAnimal = value!;
-                                });
-                              },
-                              items: animalesPrueba.map((Animal an) {
-                                return DropdownMenuItem<String>(value: an.id.toString(), child: Text(an.nombre));
-                              }).toList(),
-                              validator: (value) => value == null
-                                  ? 'Seleccione una mascota': null,
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.pets),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                                errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
-                                disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
-                                labelText: "Mascota",
+                          child: FutureBuilder(
+                            future: animalitos,
+                            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                              if(snapshot.hasData){
+                                print("Tiene dataaaaaaaaaaaaaaaaa");
+                                return DropdownButtonFormField<String>(
+                                    isExpanded: true,
+                                    //icon: Icon(Icons.pets),
+                                    hint: idAnimal == null ? Text("") : Text(idAnimal!),
+                                    value: idAnimal,
+                                    onChanged: (var value) {
+                                      setState(() {
+                                        idAnimal = value!;
+                                      });
+                                    },
+                                    items: snapshot.requireData.map<DropdownMenuItem<String>>((Animal an) {
+                                      return DropdownMenuItem<String>(value: an.id.toString(), child: Text(an.nombre),
+                                          onTap: () {nombreAnimal = an.nombre;});
+                                    }).toList(),
+                                    validator: (value) => value == null
+                                        ? 'Seleccione una mascota': null,
+                                    decoration: InputDecoration(
+                                      prefixIcon: Icon(Icons.pets),
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                      errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                      disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                      labelText: "Mascota",
+                                    )
 
-                              )
+                                );
+                              }
+                              else if(snapshot.hasError){
+                                return Text("Error al cargar las mascotas.");
+                              }
+                              else {
+                                return DropdownButtonFormField(items: [],
+                                    decoration:
+                                    InputDecoration(
+                                        prefixIcon: Icon(Icons.pets),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                        errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                        disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                        labelText: 'Cargando mascotas'
+                                    )
+                                );
+
+                              }
+                            },
 
                           ),
                         ),
@@ -109,8 +142,8 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                             obscureText: false,
                             decoration: InputDecoration(
                               prefixIcon: Icon(Icons.edit_rounded),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                               errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
                               disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                               labelText: 'Nombre del Medicamento',
@@ -134,8 +167,8 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                             obscureText: false,
                             decoration: InputDecoration(
                               prefixIcon: Icon(Icons.adjust),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                               errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
                               disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                               labelText: 'Cantidad (ej. 1 tableta)',
@@ -171,7 +204,8 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                             padding: const EdgeInsets.all(8.0),
                             child: DateTimePicker(
                                 type: DateTimePickerType.dateTime,
-                                initialValue: fechaInicio.toString(),
+                                dateMask: 'dd-MM-yyyy HH:mm',
+                                initialValue: fechabonita(fechaInicio),
                                 firstDate: DateTime(2015),
                                 lastDate: DateTime(2100),
                                 dateLabelText: 'Fecha de Inicio',
@@ -183,7 +217,7 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                                 decoration: InputDecoration(
                                   prefixIcon: Icon(Icons.calendar_today),
                                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
-                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                   errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
                                   disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                   labelText: 'Fecha de Inicio',
@@ -209,7 +243,7 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                                         decoration: InputDecoration(
                                           prefixIcon: Icon(Icons.timer),
                                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                           errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
                                           disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                           labelText: 'Cada'
@@ -233,7 +267,7 @@ class _AddMedicamentoState extends State<AddMedicamento> {
 
                                     child: DropdownButtonFormField<String>(
                                         isExpanded: true,
-                                        hint: periodoCada == null ? Text("Periodo") : Text(periodoCada!),
+                                        hint: periodoCada == null ? Text("") : Text(periodoCada!),
                                         value: periodoCada,
                                         onChanged: (var value) {
                                           setState(() {
@@ -248,10 +282,11 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                                         //decoration: InputDecoration(enabledBorder: InputBorder.none,)
                                         decoration: InputDecoration(
                                           prefixIcon: Icon(Icons.timer_10_sharp),
-                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                           errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
                                           disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                          labelText: "Periodo"
 
 
                                         )
@@ -281,7 +316,7 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                                         decoration: InputDecoration(
                                             prefixIcon: Icon(Icons.timer),
                                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                             errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
                                             disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                             labelText: 'Durante'
@@ -319,7 +354,7 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                                         decoration: InputDecoration(
                                           prefixIcon: Icon(Icons.timer_10_sharp),
                                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                           errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
                                           disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                           labelText:'',
@@ -344,12 +379,8 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                   ),
                 ),
               ),
-
             ],
           ),
-
-
-
         ),
 
           Padding(
@@ -392,21 +423,18 @@ class _AddMedicamentoState extends State<AddMedicamento> {
           return AlertDialog (title: Text("Confirme los datos"),
               content: SingleChildScrollView(
                   child: ListBody(children: [
-                    Text("Tipo de Evento:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(tipoEvento),
-                    Text("ID animal:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(idAnimal!),
+                    Text("Animal:", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(nombreAnimal),
                     Text("Nombre:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(nombreController.text),
                     Text("Cantidad:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(cantidadController.text),
                     Text("Fecha de Inicio:", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(fechaInicio.toString()),
+                    Text(fechabonita(fechaInicio)),
                     Text("Cada cuanto:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text("${intervaloCadaController.text} $periodoCada"),
                     Text("Durante:", style: TextStyle(fontWeight: FontWeight.bold)),
                     Text("${intervaloDuranteController.text} $periodoDurante"),
-
                   ]
                   )
               ),
@@ -415,18 +443,38 @@ class _AddMedicamentoState extends State<AddMedicamento> {
                   Navigator.pop(context);
                 }
                 ),
-                TextButton(child: Text("OK", style:TextStyle(color:Theme.of(context).accentColor)), onPressed:(){
+                TextButton(child: Text("OK", style:TextStyle(color:Theme.of(context).accentColor)), onPressed:() async {
+                  DateTime fechaT=fechaInicio;
+                  if(periodoDurante=='Dias') fechaT=fechaInicio.add(Duration(days: int.parse(intervaloDuranteController.text)));
+                  else if(periodoDurante=='Semanas') fechaT=fechaInicio.add(Duration(days: int.parse(intervaloDuranteController.text)*7));
+                  else if(periodoDurante=='Meses') fechaT=fechaInicio.add(Duration(days: int.parse(intervaloDuranteController.text)*30));
+                  else print("Faltan ifs de periodos!!!!!!!!!1");
+                  PlanMedicacion pm = PlanMedicacion(
+                      dosis: cantidadController.text.isEmpty?'-':cantidadController.text,
+                      nombre: nombreController.text,
+                      fechaInicio: fechaInicio,
+                      fechaTermino: fechaT,
+                      periodicidad: intervaloCadaController.text + " " + periodoCada!,
+                      observaciones: '',
+                      idAnimal: int.parse(idAnimal!),
+                  );
 
-                  //TODO: Poner la llamada a la api aquí.
+                  bool valor= await API.addPlanMedicacion(pm);
+                  if(valor){
+                    final snackbar = SnackBar(
+                        content: Text("Plan Medicamento guardado exitosamente."));
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    //Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                  }
+                  else {
+                    final snackbar = SnackBar(
+                        content: Text("Falló al guardar Plan de Medicamento."));
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                  }
 
-                  final snackbar = SnackBar(
-                      content: Text("Evento guardado exitosamente.") );
-
-                  //TODO: Cambiar por ruta nombrada en vez de pop().
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(snackbar);
 
                 }
                 )
@@ -438,10 +486,8 @@ class _AddMedicamentoState extends State<AddMedicamento> {
   }
 
   String fechabonita(DateTime dt){
-    var stringList =  dt.toIso8601String().split(new RegExp(r"[T\.]"));
-    var numeritos= stringList[0].split("-");
-    var fechabien = "" + numeritos[2] + "-" + numeritos[1] + '-' + numeritos[0];
-    return fechabien;
+    initializeDateFormatting('es_US', null);
+    return DateFormat('dd-MMMM-yyyy HH:mm', 'es_US').format(dt);
   }
 
 }

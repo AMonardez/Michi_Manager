@@ -1,5 +1,5 @@
 name: michi_manager
-description: La aplicación para que tu gato no se muera de hambre.
+description: La aplicación para cuidar a tus mascotas.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -23,6 +23,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations: # Add this line
+    sdk: flutter         # Add this line
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -46,6 +48,7 @@ dependencies:
   line_icons: ^2.0.1
   intl: ^0.17.0
   shared_preferences: ^2.0.6
+  provider:
 
 dev_dependencies:
   flutter_test:

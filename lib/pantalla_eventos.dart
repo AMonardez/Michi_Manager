@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:michi_manager/lista_eventos.dart';
+
+import 'otros/lista_eventos.dart';
+
 
 class PantallaEventos extends StatefulWidget{
   @override

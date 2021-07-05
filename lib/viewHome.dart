@@ -8,12 +8,13 @@ import 'package:line_icons/line_icons.dart';
 import 'package:michi_manager/models/Evento.dart';
 import 'package:michi_manager/viewGraficos.dart';
 import 'package:michi_manager/viewListadoMascotas.dart';
+import 'API.dart';
 import 'components/fabuloso.dart';
 import 'components/menu_anvorgueso.dart';
 
 class PaginaPrincipalState extends State<PaginaPrincipal> {
   int indiceSeleccionado=1;
-  late List<Evento> listaEventos;
+  late Future<List<Evento>> listaEventos;
 
 
 
@@ -21,7 +22,8 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
 
   initState(){
     super.initState();
-    listaEventos = Evento.listaEjemplos();
+    //listaEventos = Evento.listaEjemplos();
+    listaEventos = API.getTimeline();
   }
 
   @override
@@ -41,79 +43,105 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.only(left:15, right:8.0),
-          child: Timeline.tileBuilder(
-            theme: TimelineThemeData(
-              nodePosition: 0,
-              nodeItemOverlap: false,
-              connectorTheme: ConnectorThemeData(
-                color: Color(0xff48c6ef),
-                thickness: 3.0,
-              ),
-            ),
-            builder: TimelineTileBuilder.connectedFromStyle(
-              contentsAlign: ContentsAlign.basic,
-
-              indicatorStyleBuilder: ((context,index)=> (listaEventos[index].cumplido==true?IndicatorStyle.dot:IndicatorStyle.outlined)),
-              connectionDirection: ConnectionDirection.after,
-              connectorStyleBuilder: ((context,index)=> ConnectorStyle.solidLine),
-              contentsBuilder: (context, index) => Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left:20.0),
-                      //child: Text("${fechabonita(listaEventos[index].fecha)} ",
-                      child: Text(fechabonita(listaEventos[index].fecha),
-                        style:TextStyle(color:Colors.grey, fontSize:10), textAlign: TextAlign.start,),
+          child: FutureBuilder(
+            future: listaEventos,
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+              if(snapshot.hasData){
+                return Timeline.tileBuilder(
+                  theme: TimelineThemeData(
+                    nodePosition: 0,
+                    nodeItemOverlap: false,
+                    connectorTheme: ConnectorThemeData(
+                      color: Color(0xff48c6ef),
+                      thickness: 3.0,
                     ),
-                    Card(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-                        child: ExpansionTile(
-                            leading: Icon(listaEventos[index].tipo=="Alimentación"?LineIcons.drumstickWithBiteTakenOut:LineIcons.capsules, color:Colors.grey),
+                  ),
+                  builder: TimelineTileBuilder.connectedFromStyle(
+                    contentsAlign: ContentsAlign.basic,
 
-                            title: Column(
-                              children: [
-                                Text(listaEventos[index].nombre),
-                                Text(listaEventos[index].nombreAnimal, style:TextStyle(color:Colors.grey, fontSize:10), textAlign: TextAlign.start,) ,
-                              ],
-                            ),
-                            children: [Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: [
-                                  Text("Cantidad:", style: TextStyle(fontWeight: FontWeight.bold)),
-                                  Text(listaEventos[index].cantidad),
-                                  Text("Estado:", style: TextStyle(fontWeight: FontWeight.bold)),
-                                  Text(listaEventos[index].cumplido==true?"Cumplido":"Pendiente"),
-                                  ElevatedButton(child: Text(listaEventos[index].cumplido==true?"DESMARCAR":"CUMPLIR"),
+                    indicatorStyleBuilder: ((context,index)=> (snapshot.requireData[index].cumplido==true?IndicatorStyle.dot:IndicatorStyle.outlined)),
+                    connectionDirection: ConnectionDirection.after,
+                    connectorStyleBuilder: ((context,index)=> ConnectorStyle.solidLine),
+                    contentsBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left:20.0),
+                            //child: Text("${fechabonita(listaEventos[index].fecha)} ",
+                            child: Text(fechabonita(snapshot.requireData[index].fecha),
+                              style:TextStyle(color:Colors.grey, fontSize:10), textAlign: TextAlign.start,),
+                          ),
+                          Card(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                              child: ExpansionTile(
+                                  leading: Icon(snapshot.requireData[index].tipoEvento=="alimentacion"?LineIcons.drumstickWithBiteTakenOut:LineIcons.capsules, color:Colors.grey),
 
-                                    onPressed: () { //if(value!=null) listaEventos[index].cumplido=value;
-                                      setState(() {
-                                        List<Evento> aux= listaEventos;
-                                        aux[index].cumplido=!aux[index].cumplido;
-                                        listaEventos=aux;
+                                  title: Column(
+                                    children: [
+                                      Text(snapshot.requireData[index].nombreEvento),
+                                      Text(snapshot.requireData[index].nombreAnimal, style:TextStyle(color:Colors.grey, fontSize:10), textAlign: TextAlign.start,) ,
+                                    ],
+                                  ),
+                                  children: [Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: [
+                                        Text("Cantidad:", style: TextStyle(fontWeight: FontWeight.bold)),
+                                        Text(snapshot.requireData[index].cantidad),
+                                        Text("idPlan:", style: TextStyle(fontWeight: FontWeight.bold)),
+                                        Text(snapshot.requireData[index].idPlan.toString()),
+                                        Text("idAnimal:", style: TextStyle(fontWeight: FontWeight.bold)),
+                                        Text(snapshot.requireData[index].idAnimal.toString()),
+                                        Text("Estado:", style: TextStyle(fontWeight: FontWeight.bold)),
+                                        Text(snapshot.requireData[index].cumplido==true?"Cumplido":"Pendiente"),
+                                        Text("Atendido por:", style: TextStyle(fontWeight: FontWeight.bold)),
+                                        Text(snapshot.requireData[index].cumplido==true?snapshot.requireData[index].nombreCuidador:"-"),
 
-                                        //TODO: Llamar al endpoint de actualizar cumplido del evento.
+                                        ElevatedButton(child: Text(snapshot.requireData[index].cumplido==true?"DESMARCAR":"CUMPLIR"),
+                                          onPressed: () async {
+                                            bool valor=false;
+                                            if(snapshot.requireData[index].tipoEvento=="alimentacion"){
+                                              valor= await API.cumplirEventoAlimentacion(snapshot.requireData[index].idPlan,
+                                                  snapshot.requireData[index].fecha, !snapshot.requireData[index].cumplido);
+                                            }
+                                            else if(snapshot.requireData[index].tipoEvento=="medicacion"){
+                                              valor = await API.cumplirEventoMedicacion(snapshot.requireData[index].idPlan,
+                                                  snapshot.requireData[index].fecha, !snapshot.requireData[index].cumplido);
+                                            }
+                                            else print("ERROR DE TIPO DE EVENTO.");
+                                            if(valor){
+                                              setState(() {
+                                                AsyncSnapshot<dynamic> snapshot2 = snapshot;
+                                                snapshot2.requireData[index].cumplido = !snapshot.requireData[index].cumplido;
+                                                snapshot = snapshot2;
+                                              });
+                                            }
+                                            else{
+                                              final snackbar = SnackBar(content: Text("Error al cumplir el evento."));
+                                              ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                                            }
+                                            }
+                                          ,),
+                                      ],
+                                    ),
+                                  ),]
+                              )
 
-                                      });}
 
-
-
-                                    ,),
-
-                                ],
-                              ),
-                            ),]
-                        )
-
-
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
-              itemCount: listaEventos.length,
-            ),
+                    itemCount: snapshot.requireData.length,
+                  ),
+                );
+              }
+              else if(snapshot.hasError) return Text("No tienes eventos.");
+              else return CircularProgressIndicator();
+            },
+
           ),
         ),
       ),
@@ -125,7 +153,8 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
                 LineIcons.paw,
                 color: Colors.black,
               ),
-              title: Text('Animales'),
+              //title: Text('Animales'),
+              label: 'Animales',
               activeIcon: Icon(
                 LineIcons.paw,
                 color: Colors.blue,
@@ -135,7 +164,8 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
                 LineIcons.home,
                 color: Colors.black,
               ),
-              title: Text('Eventos'),
+              //title: Text('Eventos'),
+              label: 'Eventos',
               activeIcon: Icon(
                 LineIcons.home,
                 color: Colors.blue,
@@ -146,7 +176,8 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
                 LineIcons.weight,
                 color: Colors.black,
               ),
-              title: Text('Peso'),
+              //title: Text('Peso'),
+              label: "Peso",
               activeIcon: Icon(
                 LineIcons.weight,
                 color: Colors.blue,
@@ -167,12 +198,6 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
     );
   }
   static String fechabonita(DateTime dt){
-    /*var stringList =  dt.toIso8601String().split(new RegExp(r"[T\.]"));
-    var numeritos= stringList[0].split("-");
-    var horitas= stringList[1].split(":");
-    var fechabien = "" + numeritos[2] + "-" + numeritos[1] + '-' + numeritos[0] + " " + horitas[0] + ":" + horitas[1];
-    return fechabien;*/
-    //Intl.defaultLocale = 'en_ES';
     initializeDateFormatting('es_US', null);
     return DateFormat('dd-MMMM HH:mm', 'es_US').format(dt);
   }

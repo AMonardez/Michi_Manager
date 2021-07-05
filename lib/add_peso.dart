@@ -3,7 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter_spinbox/flutter_spinbox.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+//import 'package:intl/intl.dart';
 
 import 'API.dart';
 import 'models/RegistroPeso.dart';
@@ -17,7 +19,9 @@ class AddPeso extends StatefulWidget {
 class _AddPesoState extends State<AddPeso> {
   final _formKey = GlobalKey<FormState>();
   late List<Animal> animalesPrueba;
+  late Future<List<Animal>> animalitos;
   String? idAnimal;
+  String nombreAnimal='';
   var fecha = DateTime.now();
   double peso = 0.0;
   Widget spb= SpinBox();
@@ -25,8 +29,11 @@ class _AddPesoState extends State<AddPeso> {
 
   @override
   initState() {
+    t.text='${peso.toString()}';
     super.initState();
     animalesPrueba = Animal.animalesDePrueba();
+    animalitos = API.getMisAnimales('', '');
+
     fecha = DateTime.now();
   }
 
@@ -69,39 +76,64 @@ class _AddPesoState extends State<AddPeso> {
                                 child: Text("Registro de peso",
                                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20))),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: DropdownButtonFormField<String>(
-                                isExpanded: true,
-                                //icon: Icon(Icons.pets),
-                                hint: idAnimal == null ? Text("") : Text(idAnimal!),
-                                value: idAnimal,
-                                onChanged: (var value) async {
-                                  double pesillo= await API.getLastPeso(int.parse(value!));
-                                  setState(() {
-                                    idAnimal = value;
-                                    peso=pesillo;
-                                    t.text= pesillo.toString();
-                                    t.text= NumberFormat("###.0", "en_US").format(pesillo);
+                          FutureBuilder<List<Animal>>(
+                            future: animalitos,
+                            builder: (context, snapshot){
+                              if(snapshot.hasData) {
+                                return Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: DropdownButtonFormField<String>(
+                                        isExpanded: true,
+                                        //icon: Icon(Icons.pets),
+                                        hint: idAnimal == null ? Text("") : Text(idAnimal!),
+                                        value: idAnimal,
+                                        onChanged: (var value) async {
+                                          double pesillo= await API.getLastPeso(int.parse(value!));
+                                          setState(() {
+                                            idAnimal = value;
+                                            peso=pesillo;
+                                            t.text= pesillo.toString();
+                                            //t.text= NumberFormat("###.0", "en_US").format(pesillo);
+                                            t.text = pesillo.toStringAsFixed(1);
 
-                                  });
-                                  print("Se setea el estado? peso=$peso");
-                                },
-                                items: animalesPrueba.map((Animal an) {
-                                  return DropdownMenuItem<String>(value: an.id.toString(), child: Text(an.nombre));
-                                }).toList(),
-                                validator: (value) => value == null
-                                    ? 'Seleccione una mascota': null,
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.pets),
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
-                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
-                                  errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
-                                  disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
-                                    labelText: 'Mascota'
-                                )
+                                          });
+                                          print("Se setea el estado? peso=$peso");
+                                        },
+                                        items: snapshot.requireData.map((Animal an) {
+                                          return DropdownMenuItem<String>(value: an.id.toString(), child: Text(an.nombre), onTap: (){
+                                            nombreAnimal=an.nombre;
+                                          });
+                                        }
+    ).toList(),
+                                      validator: (value) => value == null
+                                          ? 'Seleccione una mascota': null,
+                                      decoration: InputDecoration(
+                                          prefixIcon: Icon(Icons.pets),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                          errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                          disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                          labelText: 'Mascota'
+                                      )
 
-                            ),
+                                  ),
+                                );}
+                                else return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: DropdownButtonFormField(items: [],
+                                      decoration:
+                                      InputDecoration(
+                                          prefixIcon: Icon(Icons.pets),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.cyan)),
+                                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                          errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                          disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                          labelText: 'Cargando mascotas'
+                                      )
+                                  ),
+                                );
+                            },
+
                           ),
 
                           Padding(
@@ -109,6 +141,7 @@ class _AddPesoState extends State<AddPeso> {
                               child: DateTimePicker(
                                 icon: Icon(Icons.calendar_today),
                                 type: DateTimePickerType.date,
+                                dateMask: 'dd-MM-yyyy',
                                 initialValue: fecha.toString(),
                                 firstDate: DateTime(2015),
                                 lastDate: DateTime(2100),
@@ -149,8 +182,20 @@ class _AddPesoState extends State<AddPeso> {
 
                                       suffixText: "kg",
                                       hintText: "Escribe un numero",
-                                      prefixIcon: Icon(Icons.exposure_minus_1),
-                                      suffixIcon: Icon(Icons.plus_one),
+                                      prefixIcon: InkWell(child: Icon(Icons.remove),
+                                            onTap: () {
+                                                //print("");
+                                                peso=double.parse(t.text);
+                                                peso=peso-0.1;
+                                                t.text=peso.toStringAsFixed(1);
+                                            }),
+                                      suffixIcon: InkWell(child: Icon(Icons.add),
+                                          onTap: () {
+                                            //print("");
+                                            peso=double.parse(t.text);
+                                            peso=peso+0.1;
+                                            t.text=peso.toStringAsFixed(1);
+                                          }),
 
                                     ),
 
@@ -256,12 +301,12 @@ class _AddPesoState extends State<AddPeso> {
               title: Text("Confirme los datos"),
               content: SingleChildScrollView(
                   child: ListBody(children: [
-                Text("ID animal:", style: TextStyle(fontWeight: FontWeight.bold)),
-                Text(idAnimal!),
+                Text("Animal:", style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(nombreAnimal),
                 Text("Peso:", style: TextStyle(fontWeight: FontWeight.bold)),
-                Text(t.text),
+                Text("${t.text} kg"),
                 Text("Fecha:", style: TextStyle(fontWeight: FontWeight.bold)),
-                Text(fecha.toString()),
+                Text(fechabonita(fecha)),
               ])),
               actions: [
                 TextButton(
@@ -297,5 +342,10 @@ class _AddPesoState extends State<AddPeso> {
                 )
               ]);
         });
+  }
+
+  String fechabonita(DateTime dt){
+    initializeDateFormatting('es_US', null);
+    return DateFormat('dd-MMMM-yyyy', 'es_US').format(dt);
   }
 }

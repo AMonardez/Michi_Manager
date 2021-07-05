@@ -19,8 +19,8 @@ class EstadoFabuloso extends State<Fabuloso>{
     return FabCircularMenu(
 
 
-        fabCloseIcon: Icon(Icons.close),
-        fabOpenIcon: Icon(Icons.add),
+        fabCloseIcon: Icon(Icons.close, color: Colors.white,),
+        fabOpenIcon: Icon(Icons.add, color: Colors.white),
         children: <Widget>[
           InkWell(
             onTap: ( ) {
