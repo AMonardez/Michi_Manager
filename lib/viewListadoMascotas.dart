@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ionicons/ionicons.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:michi_manager/manage_alimentacion.dart';
 
 import 'manage_cuidadores.dart';
+import 'manage_medicamentos.dart';
 import 'models/Animal.dart';
 import 'API.dart';
 
@@ -111,9 +112,19 @@ class _ListaAnimalesState extends State<ListaAnimales> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Spacer(flex:1),
-                                          Icon(LineIcons.drumstickWithBiteTakenOut),
+                                          InkWell(
+                                              child: Icon(LineIcons.drumstickWithBiteTakenOut),
+                                            onTap: (){
+                                              Navigator.push(context, MaterialPageRoute(builder: (context) => ManejaAlimentacion(snapshot.requireData[index])));
+                                            },
+
+                                          ),
                                           Spacer(flex:2),
-                                          Icon(LineIcons.capsules),
+                                          InkWell(child: Icon(LineIcons.capsules),
+                                            onTap: (){
+                                              Navigator.push(context, MaterialPageRoute(builder: (context) => ManejaMedicacion(snapshot.requireData[index])));
+                                            },
+                                          ),
                                           Spacer(flex: 2),
                                           InkWell(child: Icon(LineIcons.nurse),
 

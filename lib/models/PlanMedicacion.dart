@@ -6,6 +6,7 @@ class PlanMedicacion{
   int idAnimal;
   String periodicidad;
   String observaciones;
+  int? idPlan=-1;
 
   PlanMedicacion({
     required this.nombre,
@@ -14,7 +15,8 @@ class PlanMedicacion{
     required this.fechaTermino,
     required this.idAnimal ,
     required this.periodicidad,
-    required this.observaciones,});
+    required this.observaciones,
+  this.idPlan});
 
   Map<String, String> toJson()=>{
     "nombre_medicamento": nombre,
@@ -25,6 +27,19 @@ class PlanMedicacion{
     "periodicidad": periodicidad.replaceAll('Horas', 'hours').replaceAll('Dias', 'days').replaceAll('Semanas','weeks'),
     "observaciones": observaciones,
   };
+
+  factory PlanMedicacion.fromJson(Map<String, dynamic> json) {
+    return PlanMedicacion(
+        periodicidad: json['periodicidad'].replaceAll('Horas', 'hours').replaceAll('Dias', 'days').replaceAll('Semanas','weeks'),
+        fechaInicio: DateTime.parse(json['fecha_inicio']),
+        fechaTermino: DateTime.parse(json['fecha_termino']),
+        nombre: json['nombre_medicamento'],
+        observaciones: json['observaciones'].isEmpty?'-':json['observaciones'],
+        dosis: json['dosis'],
+        idAnimal: json['id_animal'],
+        idPlan: json['id_medicamento']
+        );
+  }
 
   toString(){
     return """

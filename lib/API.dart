@@ -180,33 +180,39 @@ class API {
     print("API: loginCuidador");
     print("bodo");
     print(bodo.toString());
-    final response = await http.post(
-        Uri.parse(servidor + '/login'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(bodo)
-    );
-    print(jsonEncode(bodo));
-    print("StatusCode: ${response.statusCode}");
-    print("Body:\n"+response.body);
+    try{
+      final response = await http.post(
+          Uri.parse(servidor + '/login'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(bodo)
+      );
+      print(jsonEncode(bodo));
+      print("StatusCode: ${response.statusCode}");
+      print("Body:\n"+response.body);
 
-    if(response.statusCode==200 || response.statusCode==400){
-      var coso = jsonDecode(response.body);
-      if(coso["ok"]){
-        var f = await SharedPreferences.getInstance();
-        f.setString("nombre", coso["result"]["nombre"]);
-        f.setString("correo", correo);
-        f.setString("contrasena", contrasena);
-        f.setInt("id_cuidador", coso["result"]["id_cuidador"]);
-        print(f.getString("nombre"));
-        print(f.getString("correo"));
-        print(f.getInt("id_cuidador"));
+      if(response.statusCode==200 || response.statusCode==400){
+        var coso = jsonDecode(response.body);
+        if(coso["ok"]){
+          var f = await SharedPreferences.getInstance();
+          f.setString("nombre", coso["result"]["nombre"]);
+          f.setString("correo", correo);
+          f.setString("contrasena", contrasena);
+          f.setInt("id_cuidador", coso["result"]["id_cuidador"]);
+          print(f.getString("nombre"));
+          print(f.getString("correo"));
+          print(f.getInt("id_cuidador"));
+        }
+
+        return coso["ok"];
       }
-
-      return coso["ok"];
+      else return false;
     }
-    else return false;
+    on Exception{
+      return false;
+    }
+
   }
 
   static Future<List<Animal>> getMisAnimales(String correo, String contrasena) async {
@@ -465,10 +471,71 @@ class API {
     }
   }
 
+  static Future<List<PlanAlimentacion>> getPlanesAlimentacion(int idAnimal) async {
+    List<PlanAlimentacion> lpa=[];
+    final response = await http.get(
+      Uri.parse(servidor + '/plan_alimentacion?id_animal=$idAnimal'),
+      headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8',},
+    );
+    print("Get Planes Alimentacion");
+    print("StatusCode: ${response.statusCode}(${response.reasonPhrase})");
+    print("Body:\n"+response.body);
+    if(response.statusCode==200 || response.statusCode==400){
+      var coso = jsonDecode(response.body);
+      for(var pa in coso["planes"])
+        lpa.add(PlanAlimentacion.fromJson(pa));
+    }
+    return lpa;
+  }
 
+  static Future<bool> deletePAlimentacion(int idPlanAlimentacion) async {
+    //List<Animal> listilla;
+    final response =
+    await http.delete(Uri.parse(servidor + '/delete_plan_alimentacion?id_plan_alimentacion=$idPlanAlimentacion'));
+    print("Statuscode: ${response.statusCode}");
+    if (response.statusCode == 200 || response.statusCode==400) {
+      Map<String, dynamic> cosa = jsonDecode(response.body);
+      print(response.body);
+      return cosa["ok"];
+    } else {
+      print("Statuscode: ${response.statusCode}");
+      return false;
+      //throw Exception('Falla al conectarse a la api.');
+    }
+  }
 
+  static Future<List<PlanMedicacion>> getMedicamentos(int idAnimal) async {
+    List<PlanMedicacion> lpm=[];
+    final response = await http.get(
+      Uri.parse(servidor + '/medicamento?id_animal=$idAnimal'),
+      headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8',},
+    );
+    print("Get Medicamentos");
+    print("StatusCode: ${response.statusCode}(${response.reasonPhrase})");
+    print("Body:\n"+response.body);
+    if(response.statusCode==200 || response.statusCode==400){
+      var coso = jsonDecode(response.body);
+      for(var pm in coso["medicamentos"])
+        lpm.add(PlanMedicacion.fromJson(pm));
+    }
+    return lpm;
+  }
 
-
+  static Future<bool> deletePMedicacion(int idPlanMedicacion) async {
+    //List<Animal> listilla;
+    final response =
+    await http.delete(Uri.parse(servidor + '/delete_medicamento?id_medicamento=$idPlanMedicacion'));
+    print("Statuscode: ${response.statusCode}");
+    if (response.statusCode == 200 || response.statusCode==400) {
+      Map<String, dynamic> cosa = jsonDecode(response.body);
+      print(response.body);
+      return cosa["ok"];
+    } else {
+      print("Statuscode: ${response.statusCode}");
+      return false;
+      //throw Exception('Falla al conectarse a la api.');
+    }
+  }
 
 
 }

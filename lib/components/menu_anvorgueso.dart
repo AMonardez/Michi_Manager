@@ -10,6 +10,7 @@ import '../add_mascota.dart';
 import '../add_medicamento.dart';
 import '../add_peso.dart';
 import '../login.dart';
+import '../test_charts.dart';
 
 class MenuAnvorgueso extends StatefulWidget{
   @override
@@ -174,16 +175,16 @@ class MenuAnvorguesoState extends State<MenuAnvorgueso>{
               },
             ),
 
-            /*AbsorbPointer(child: ListTile(title: Text('Extras'))),
+            AbsorbPointer(child: ListTile(title: Text('Extras'))),
             ListTile(
               leading: Icon(Icons.precision_manufacturing_rounded),
               title: Text("Experimentos"),
               //title: Row(children: <Widget>[Icon(Ionicons.ios_rocket), Text("Experimentos")],),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Testeos()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => TestCharts()));
               },
             ),
-            Divider(),*/
+            Divider(),
             AbsorbPointer(child: ListTile(title: Text('Otros'))),
             ListTile(
               leading: Icon(Icons.info_rounded),
@@ -192,9 +193,9 @@ class MenuAnvorguesoState extends State<MenuAnvorgueso>{
               onTap: () {
                 showAboutDialog(
                     context: context,
-                    applicationName: "Maneja tus michitos",
-                    applicationVersion: "0.1-dev",
-                    applicationLegalese: "Blablabla");
+                    applicationName: "Maneja tus Michis",
+                    applicationVersion: "0.2-dev",
+                    applicationLegalese: "Todos los derechos reservados. (?)");
               },
             ),
 

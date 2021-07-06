@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:michi_manager/NotificacionHelper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timelines/timelines.dart';
 import 'package:line_icons/line_icons.dart';
@@ -16,8 +17,6 @@ import 'components/menu_anvorgueso.dart';
 class PaginaPrincipalState extends State<PaginaPrincipal> {
   int indiceSeleccionado=1;
   late Future<List<Evento>> listaEventos;
-
-
 
   List<Widget> paneles= [ListaAnimales(), PaginaPrincipal(), ViewGraficos() ];
 
@@ -55,7 +54,10 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
                       children: [
                     Text("No tienes eventos pendientes."),
                     Text("Prueba a agregar planes de alimentación o medicación.")]);
-                else return Timeline.tileBuilder(
+                else {
+                  deleteNotificaciones();
+                  postNotificaciones(filterFuturos(snapshot.requireData));
+                  return Timeline.tileBuilder(
                   theme: TimelineThemeData(
                     nodePosition: 0,
                     nodeItemOverlap: false,
@@ -150,7 +152,7 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
                     itemCount: snapshot.requireData.length,
                   ),
                 );
-              }
+              }}
               else if(snapshot.hasError) return Text("Error al consultar eventos.");
               else return CircularProgressIndicator();
             },
@@ -196,21 +198,15 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
                 color: Colors.blue,
               ),
             ),
-
           ],
           onTap: (index) {
             if(index==1){
               setState(() {
                 listaEventos = API.getTimeline();
               });
-
             }
             else Navigator.push(context, MaterialPageRoute(builder: (context) => paneles[index]));
-
           }
-
-
-
       ),
 
       floatingActionButton: Fabuloso(),

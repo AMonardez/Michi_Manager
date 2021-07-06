@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_charts/flutter_charts.dart';
+import 'package:flutter/services.dart';
+
+import 'NotificacionHelper.dart';
+import 'models/Evento.dart';
 
 class TestCharts extends StatelessWidget {
   @override
@@ -22,7 +25,26 @@ class TestCharts extends StatelessWidget {
                     fontSize: 40,
                   ),
                 ),
+                ElevatedButton(child: Text("Post Notificacion"), onPressed: () async {
+                  print("Presionado");
+                  await deleteNotificaciones();
+                  await postNotificaciones(filterFuturos(lev));
+                  },
+                ),
+                ElevatedButton(child: Text("Delete Notificaciones"), onPressed: () async {
+                  print("Presionado");
+                  await deleteNotificaciones();
+                },
+                )
               ])),
     );
   }
+
+  List<Evento> lev = [
+    Evento(idPlan:1, idAnimal:1, tipoEvento:"alimentacion", nombreAnimal:'Luna', nombreEvento: "Whiskas1", cantidad: "200gr", fecha: DateTime.now().add(Duration(seconds: 1)),  cumplido:false, nombreCuidador: "-"),
+    Evento(idPlan:1, idAnimal:1, tipoEvento:"alimentacion", nombreAnimal:'Luna', nombreEvento: "Whiskas2", cantidad: "200gr", fecha: DateTime.now().add(Duration(seconds: 15)),  cumplido:false, nombreCuidador: "-"),
+    Evento(idPlan:1, idAnimal:1, tipoEvento:"alimentacion", nombreAnimal:'Luna', nombreEvento: "Whiskas3", cantidad: "200gr", fecha: DateTime.now().add(Duration(seconds: 30)),  cumplido:true, nombreCuidador: "-"),
+    Evento(idPlan:1, idAnimal:1, tipoEvento:"alimentacion", nombreAnimal:'Luna', nombreEvento: "Whiskas4", cantidad: "200gr", fecha: DateTime.now().add(Duration(seconds: 45)),  cumplido:false, nombreCuidador: "-"),
+  ];
+
 }

@@ -19,7 +19,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
-  bool loginado=false;
+  final bool loginado;
 
   MyApp(this.loginado);
 

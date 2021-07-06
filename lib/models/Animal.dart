@@ -78,6 +78,7 @@ class Animal{
                   observaciones: json['observaciones']
     );
   }
+
   List<Animal> listadoJson(Map<String, dynamic> json){
     List<Animal> aux=[];
     aux.add(Animal.dePrueba());
