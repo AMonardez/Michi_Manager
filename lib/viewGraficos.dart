@@ -222,6 +222,8 @@ class ViewGraficosState extends State<ViewGraficos>{
       ),
       gridData: FlGridData(
         show: true,
+        horizontalInterval: 5.0,
+
       ),
       titlesData: FlTitlesData(
         bottomTitles: SideTitles(
@@ -253,7 +255,7 @@ class ViewGraficosState extends State<ViewGraficos>{
           },
           //margin: 8,
           //reservedSize: 30,
-          interval: null,
+          interval: 5.0,
 
         ),
       ),
@@ -280,8 +282,8 @@ class ViewGraficosState extends State<ViewGraficos>{
       ),
       /*minX: 0,
       maxX: 14,
-      maxY: 4,
-      minY: 0,*/
+      maxY: 4,*/
+      minY: 0,
       lineBarsData: linesBarData1(lrp),
     );
   }
@@ -307,7 +309,7 @@ class ViewGraficosState extends State<ViewGraficos>{
         FlSpot(2, DateTime.now().add(Duration(seconds: 10)).millisecondsSinceEpoch/1000),
         FlSpot(3, DateTime.now().add(Duration(seconds: 20)).millisecondsSinceEpoch/1000),
       ],*/
-      isCurved: true,
+      isCurved: false,
       colors: [
         Color(0xff48c6ef),
       ],

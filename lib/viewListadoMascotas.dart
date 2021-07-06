@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:michi_manager/manage_alimentacion.dart';
 
+import 'add_mascota.dart';
 import 'manage_cuidadores.dart';
 import 'manage_medicamentos.dart';
 import 'models/Animal.dart';
@@ -184,7 +185,14 @@ class _ListaAnimalesState extends State<ListaAnimales> {
 
 
           ],
-        )
+        ),
+      floatingActionButton: FloatingActionButton(child: Icon(Icons.add, color: Colors.white,),onPressed: () async {
+        var p = await Navigator.push(context, MaterialPageRoute(builder: (context) => AgregaPaciente())).whenComplete(() =>
+            setState((){listadoanimalitos = API.getMisAnimales("", "");})
+
+        );
+      }
+      )
 
 
 

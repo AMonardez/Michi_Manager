@@ -14,6 +14,9 @@ Future<bool> getLoginado() async {
 
 void main() async {
   bool valor = await getLoginado();
+
+
+
   runApp(MyApp(valor));
 }
 

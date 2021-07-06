@@ -146,16 +146,19 @@ class _AddPesoState extends State<AddPeso> {
                                 firstDate: DateTime(2015),
                                 lastDate: DateTime(2100),
                                 dateLabelText: 'Fecha de Registro',
-                                onChanged: (val) => fecha = DateTime.parse(val),
-                                validator: (val) {
+                                onChanged: (val) {
+                                  fecha = DateTime.parse(val);
+                                  print(fecha.toIso8601String());},
+                                  validator: (val) {
                                   //print(val);
                                   return null;
-                                },
+                                  },
                                   decoration: InputDecoration(
-                                    prefixIcon: Icon(Icons.calendar_today),
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
-                                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
-                                    errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
+                                  prefixIcon: Icon(Icons.calendar_today),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30.0), borderSide: BorderSide(color: Colors.cyan)),
+                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
+                                  errorBorder: OutlineInputBorder(borderRadius:
+                                 BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.red)),
                                     disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(45.0), borderSide: BorderSide(color: Colors.grey)),
                                     labelText: 'Fecha de Registro',
 

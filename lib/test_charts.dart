@@ -18,13 +18,6 @@ class TestCharts extends StatelessWidget {
               MainAxisAlignment.spaceEvenly, //.center pega todo y lo junta
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Text(
-                  'Hola mediano 40',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 40,
-                  ),
-                ),
                 ElevatedButton(child: Text("Post Notificacion"), onPressed: () async {
                   print("Presionado");
                   await deleteNotificaciones();

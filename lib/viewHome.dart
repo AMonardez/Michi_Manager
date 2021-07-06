@@ -85,13 +85,15 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
                           ),
                           Card(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                              shadowColor:getClosestIndex(snapshot.requireData)==index?Colors.blue:null,
+                              elevation:getClosestIndex(snapshot.requireData)==index?20:null,
                               child: ExpansionTile(
                                   leading: Icon(snapshot.requireData[index].tipoEvento=="alimentacion"?LineIcons.drumstickWithBiteTakenOut:LineIcons.capsules, color:Colors.grey),
 
                                   title: Column(
                                     children: [
-                                      Text(snapshot.requireData[index].nombreEvento),
-                                      Text(snapshot.requireData[index].nombreAnimal, style:TextStyle(color:Colors.grey, fontSize:10), textAlign: TextAlign.start,) ,
+                                      Text(snapshot.requireData[index].nombreAnimal),
+                                      Text(snapshot.requireData[index].nombreEvento, style:TextStyle(color:Colors.grey, fontSize:10), textAlign: TextAlign.start,) ,
                                     ],
                                   ),
                                   children: [Padding(
@@ -203,6 +205,9 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
             if(index==1){
               setState(() {
                 listaEventos = API.getTimeline();
+
+
+
               });
             }
             else Navigator.push(context, MaterialPageRoute(builder: (context) => paneles[index]));
@@ -221,4 +226,18 @@ class PaginaPrincipalState extends State<PaginaPrincipal> {
 class PaginaPrincipal extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => new PaginaPrincipalState();
+}
+
+
+int getClosestIndex(List<Evento> le){
+  int idx=0;
+  DateTime dt=DateTime.now();
+  print(dt.toString());
+  for(int i =0; i<le.length; i++){
+    //print("LE ${le[i].fecha.toString()} DT ${dt.toString()} ?? ${dt.isBefore(le[i].fecha)}");
+    if(!dt.isAfter(le[i].fecha.add(Duration(hours:4))) ) return i;
+    //print(i.toString());
+  }
+  print("SAle");
+  return idx;
 }
